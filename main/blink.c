@@ -26,69 +26,60 @@
 
 #define MANCHESTER_VALUE(x)  ((x) ? MANCHESTER_ONE : MANCHESTER_ZERO)
 
-#define MANCHESTER_UPPER_BLOCK(a) \
-    (uint64_t) (   \
-	    MANCHESTER_VALUE(a & 0x04) << 36 \
-		| MANCHESTER_VALUE(a & 0x02) << 34 \
-		| MANCHESTER_VALUE(a & 0x01) << 32 \
-    )
+#define RESET_CMD 0x7FFF4
+#define RESET_CMD_LEN_BITS_SPI (19*2)
 
-#define MANCHESTER_MIDDLE_BLOCK(b) \
-    (uint64_t) (   \
-          MANCHESTER_VALUE(b & 0x80) << 30 \
-        | MANCHESTER_VALUE(b & 0x40) << 28 \
-        | MANCHESTER_VALUE(b & 0x20) << 26 \
-        | MANCHESTER_VALUE(b & 0x10) << 24 \
-        | MANCHESTER_VALUE(b & 0x08) << 22 \
-        | MANCHESTER_VALUE(b & 0x04) << 20 \
-        | MANCHESTER_VALUE(b & 0x02) << 18 \
-        | MANCHESTER_VALUE(b & 0x01) << 16 \
-    )
-#define MANCHESTER_BYTE_BLOCK1(c) \
-    (uint64_t) (    \
-          MANCHESTER_VALUE(c & 0x80) << 14 \
-        | MANCHESTER_VALUE(c & 0x40) << 12 \
-        | MANCHESTER_VALUE(c & 0x20) << 10 \
-        | MANCHESTER_VALUE(c & 0x10) << 8 \
-        | MANCHESTER_VALUE(c & 0x08) << 6 \
-        | MANCHESTER_VALUE(c & 0x04) << 4 \
-        | MANCHESTER_VALUE(c & 0x02) << 2 \
-        | MANCHESTER_VALUE(c & 0x01) \
-    )
+#define SYNCH_CMD 0x3FFF8800
+#define SYNCH_CMD_LEN_BITS_SPI (30*2)
 
-	
-#define MANCHESTER_BLOCK(a, b, c) \
-    ((uint64_t) (MANCHESTER_UPPER_BLOCK(a) | MANCHESTER_MIDDLE_BLOCK(a) | MANCHESTER_LOWER_BLOCK(b) ))
+#define START_CMD 0x7FFF2
+#define START_CMD_LEN_BITS_SPI (19*2)
+
+#define PIXELS_NUMBER 100
+#define RGB_PACKET_LEN_SPI (39*2)
 
 #define SPI_SWAP_DATA_TX_64(data, len) __builtin_bswap64((uint64_t)data<<(64-len))
 	
 spi_device_handle_t spi;
-uint32_t *spi_txdata_p;
-
-esp_err_t TLS3001_send_packet(void *data, uint32_t length);
-void *TLS3001_fill_packet(uint64_t data_in, uint32_t bit_length);
-esp_err_t SPI_init(void);
-
-
-uint64_t reset_cmd = 0;
-uint64_t start_cmd = 0;
-uint64_t swapped_data;
-
 void *spi_tx_data;
 
+esp_err_t TLS3001_send_packet(void *data, uint32_t length);
+void TLS3001_fill_packet_cmd(uint8_t *spi_manchester_data_p, uint64_t data_in, uint32_t bit_length);
+esp_err_t SPI_init(void);
+void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len);
+void deinit_spi_data_buffer(void *spi_manchester_data_p);
+void post_cb_func(spi_transaction_t* trans);
+void *TLS3001_pack_packet_color(uint8_t *spi_manchester_data_p, uint64_t data_in, uint32_t bit_length_manch, bool last_data_flag);
+uint64_t prep_pixel_packet(uint64_t red, uint64_t green, uint64_t blue);
 /* Can run 'make menuconfig' to choose the GPIO to blink,
    or you can edit the following line and set a number here.
 */
 #define BLINK_GPIO CONFIG_BLINK_GPIO
-
+uint64_t pixel_test = 0;
 void blink_task(void *pvParameter)
 {
-    /* Configure the IOMUX register for pad BLINK_GPIO (some pads are
-       muxed to GPIO on reset already, but some default to other
-       functions and need to be switched to GPIO. Consult the
-       Technical Reference for a list of pads and their default
-       functions.)
-    */
+	uint8_t *spi_tx_data_last;
+	
+	
+	pixel_test = prep_pixel_packet(4000, 4, 16);
+	
+	TLS3001_fill_packet_cmd(spi_tx_data, RESET_CMD, (RESET_CMD_LEN_BITS_SPI / 2));
+	TLS3001_send_packet(spi_tx_data, RESET_CMD_LEN_BITS_SPI);
+	
+	vTaskDelay(1 / portTICK_PERIOD_MS);
+	
+	TLS3001_fill_packet_cmd(spi_tx_data, SYNCH_CMD, (SYNCH_CMD_LEN_BITS_SPI / 2));
+	TLS3001_send_packet(spi_tx_data, SYNCH_CMD_LEN_BITS_SPI);
+	
+	vTaskDelay(10 / portTICK_PERIOD_MS);
+	
+	//pointer spi_tx_data points to start.
+	spi_tx_data_last = TLS3001_pack_packet_color(spi_tx_data, START_CMD, (START_CMD_LEN_BITS_SPI / 2), false);
+	spi_tx_data_last = TLS3001_pack_packet_color(spi_tx_data_last, pixel_test, (RGB_PACKET_LEN_SPI / 2), true);
+
+	TLS3001_send_packet(spi_tx_data, RGB_PACKET_LEN_SPI);
+	
+	
     gpio_pad_select_gpio(BLINK_GPIO);
     /* Set the GPIO as a push/pull output */
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
@@ -100,56 +91,185 @@ void blink_task(void *pvParameter)
         gpio_set_level(BLINK_GPIO, 1);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
 	    
-	    TLS3001_send_packet(spi_tx_data, 38);
+	    TLS3001_send_packet(spi_tx_data, RESET_CMD_LEN_BITS_SPI);
     }
 }
 
 void app_main()
 {
-	//reset_cmd = 0x2AAAAAAA65;
-	reset_cmd = 0x7FFF4;
-	swapped_data = SPI_SWAP_DATA_TX_64(reset_cmd, 40);
-	
-	spi_tx_data = TLS3001_fill_packet(reset_cmd, 19);
-	
-	/*test_reset[1] = (uint64_t)(
-        MANCHESTER_VALUE(1) << 30
-        | MANCHESTER_VALUE(0) << 28
-        | MANCHESTER_VALUE(0) << 26
-    );*/
 	SPI_init();
+	
+	init_spi_data_buffer(&spi_tx_data, 1500);	//1500 bytes for 100 pixels should be enough.
+	
+
 	
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
 }
 
-void *TLS3001_fill_packet(uint64_t data_in, uint32_t bit_length)
+void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len)
+{
+	*spi_manchester_data_p = heap_caps_malloc(byte_len, MALLOC_CAP_8BIT);
+}
+
+void deinit_spi_data_buffer(void *spi_manchester_data_p)
+{
+	heap_caps_free(spi_manchester_data_p);
+}
+
+void TLS3001_fill_packet_cmd(uint8_t *spi_manchester_data_p, uint64_t data_in, uint32_t bit_length_manch)
 {
 	static void *spi_manchester_data_last;
 	void *spi_manchester_data_start;
-	uint8_t *spi_manchester_data_p;
+
 	uint8_t byte_temp = 0;
-	int32_t bits_remaining = bit_length;
-	
-	spi_manchester_data_start = heap_caps_malloc(bit_length * 8, MALLOC_CAP_8BIT);
-	
-	spi_manchester_data_p = spi_manchester_data_start;
+	uint8_t byte_last_temp = 0;
+	int32_t bits_remaining = bit_length_manch;
+
+	spi_manchester_data_start = (void*)spi_manchester_data_p;
 	
 	while (bits_remaining > 0)
 	{
-		byte_temp = data_in >> (bits_remaining - 4);
-		*spi_manchester_data_p = (uint8_t)(
-			(MANCHESTER_VALUE(byte_temp & (0x08)) << 6) 
-			| (MANCHESTER_VALUE(byte_temp & (0x04)) << 4) 
-			| (MANCHESTER_VALUE(byte_temp & (0x02)) << 2) 
-			| (MANCHESTER_VALUE(byte_temp & (0x01)) << 0));
+		if (bits_remaining < 4)	//Bits remaining is somewhere between 1-3.
+		{
+			byte_temp = data_in;   //No need to right shift since we are already at lowest "byte"
+			
+			byte_last_temp |= (MANCHESTER_VALUE(byte_temp & (0x01 << (bits_remaining-1))) << 6);
+			bits_remaining -= 1;
+			if (bits_remaining <= 0)
+			{
+				*spi_manchester_data_p = (uint8_t)byte_last_temp;
+				break;
+			}
+			
+			byte_last_temp |= (MANCHESTER_VALUE(byte_temp & (0x01 << (bits_remaining - 1))) << 4);
+			bits_remaining -= 1;
+			if (bits_remaining <= 0)
+			{
+				*spi_manchester_data_p = (uint8_t)byte_last_temp;
+				break;
+			}
+			
+			byte_last_temp |= (MANCHESTER_VALUE(byte_temp & (0x01 << (bits_remaining - 1))) << 2);
+			bits_remaining -= 1;
+			if (bits_remaining <= 0)
+			{
+				*spi_manchester_data_p = (uint8_t)byte_last_temp;
+				break;
+			}
+			
+			break;	//Should be nothing left here. Last 
+			
+		}
+		else
+		{
+			byte_temp = data_in >> (bits_remaining - 4);
+			*spi_manchester_data_p = (uint8_t)(
+				(MANCHESTER_VALUE(byte_temp & (0x08)) << 6) 
+				| (MANCHESTER_VALUE(byte_temp & (0x04)) << 4) 
+				| (MANCHESTER_VALUE(byte_temp & (0x02)) << 2) 
+				| (MANCHESTER_VALUE(byte_temp & (0x01)) << 0));
+		
+			
+			bits_remaining -= 4; 
+		}
 		
 		spi_manchester_data_p++;
-		bits_remaining -= 4; 
+
 	}
 	
 	spi_manchester_data_last = (void*) spi_manchester_data_p;
 	
-	return spi_manchester_data_start;
+	spi_manchester_data_p = (void*) spi_manchester_data_start;	//Point to start of buffer again on exit
+	//return spi_manchester_data_start;
+}
+
+void *TLS3001_pack_packet_color(uint8_t *spi_manchester_data_p, uint64_t data_in, uint32_t bit_length_manch, bool last_data_flag)
+{
+	uint8_t byte_temp = 0;
+	static uint64_t data_leftover = 0;
+	static uint32_t bits_leftover = 0;
+	uint8_t byte_last_temp = 0;
+	int32_t bits_remaining = 0;
+	uint64_t data = 0;
+	
+	uint8_t *spi_manchester_data_p_last = spi_manchester_data_p;
+	
+	bits_remaining = bit_length_manch + bits_leftover;
+	data = (uint64_t)(((data_leftover << (bit_length_manch + 1)) | data_in));
+	
+	
+	while (bits_remaining > 0)
+	{
+		if (bits_remaining < 4)	//Bits remaining is somewhere between 1-3.
+			{
+				data_leftover = (uint8_t)(data & 0x0F);     
+				bits_leftover = bits_remaining;
+				
+				if (last_data_flag == true)
+				{
+					byte_last_temp |= (MANCHESTER_VALUE(data_leftover & (0x01 << (bits_remaining - 1))) << 6);
+					bits_remaining -= 1;
+					if (bits_remaining <= 0)
+					{
+						*spi_manchester_data_p_last = (uint8_t)byte_last_temp;
+						spi_manchester_data_p_last++;
+						break;
+					}
+			
+					byte_last_temp |= (MANCHESTER_VALUE(data_leftover & (0x01 << (bits_remaining - 1))) << 4);
+					bits_remaining -= 1;
+					if (bits_remaining <= 0)
+					{
+						*spi_manchester_data_p_last = (uint8_t)byte_last_temp;
+						spi_manchester_data_p_last++;
+						break;
+					}
+			
+					byte_last_temp |= (MANCHESTER_VALUE(data_leftover & (0x01 << (bits_remaining - 1))) << 2);
+					bits_remaining -= 1;
+					if (bits_remaining <= 0)
+					{
+						*spi_manchester_data_p_last = (uint8_t)byte_last_temp;
+						spi_manchester_data_p_last++;
+						break;
+					}
+					
+					break;	//Should be nothing left here. Last 
+				}
+				
+				else
+				{
+					break;		//Exit loop and wait for new data.
+				}
+				
+			}
+		else
+		{
+			byte_temp = data >> (bits_remaining - 4);
+			*spi_manchester_data_p_last = (uint8_t)(
+				(MANCHESTER_VALUE(byte_temp & (0x08)) << 6) 
+				| (MANCHESTER_VALUE(byte_temp & (0x04)) << 4) 
+				| (MANCHESTER_VALUE(byte_temp & (0x02)) << 2) 
+				| (MANCHESTER_VALUE(byte_temp & (0x01)) << 0));
+		
+			
+			bits_remaining -= 4; 
+			spi_manchester_data_p_last++;
+		}
+			
+
+	}
+	return spi_manchester_data_p_last;
+}
+
+uint64_t prep_pixel_packet(uint64_t red, uint64_t green, uint64_t blue)
+{
+	//Max number 4095 per color(12 bits) check for this
+	uint64_t pixel_packet = 0;
+	
+	pixel_packet = (uint64_t)((red << (13 * 2)) | (green << (13 * 1)) | (blue << (13 * 0))); 
+	
+	return pixel_packet;
 }
 
 esp_err_t TLS3001_send_packet(void *data, uint32_t length)
@@ -240,4 +360,11 @@ esp_err_t SPI_init(void)
 	spi_device_acquire_bus(spi, portMAX_DELAY);
 	
 	return ESP_OK;
+}
+
+void post_cb_func(spi_transaction_t* trans) {
+		//Callback when a queued SPI transmit has completed
+	
+	
+
 }
