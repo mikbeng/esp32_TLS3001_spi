@@ -998,3 +998,15 @@
 434	515	583440247	main/libmain.a	8889618533f86ed5
 515	1270	583440248	blink.elf	1fdeb79d40252786
 1270	1574	583440248	blink.bin	ecc5b306554cc6de
+44	119	583413468	bootloader-prefix/src/bootloader-stamp/bootloader-build	ddf0352df65d5f7e
+44	119	583413468	bootloader/bootloader.elf	ddf0352df65d5f7e
+44	119	583413468	bootloader/bootloader.bin	ddf0352df65d5f7e
+44	119	583413468	bootloader/bootloader.map	ddf0352df65d5f7e
+47	132	583413468	bootloader-prefix/src/bootloader-stamp/bootloader-build	ddf0352df65d5f7e
+47	132	583413468	bootloader/bootloader.elf	ddf0352df65d5f7e
+47	132	583413468	bootloader/bootloader.bin	ddf0352df65d5f7e
+47	132	583413468	bootloader/bootloader.map	ddf0352df65d5f7e
+51	449	583473532	main/CMakeFiles/main.dir/blink.c.obj	22f0a39201c3e123
+450	540	583473532	main/libmain.a	8889618533f86ed5
+540	1335	583473533	blink.elf	1fdeb79d40252786
+1335	1895	583473533	blink.bin	ecc5b306554cc6de

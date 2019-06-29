@@ -7028,7 +7028,7 @@ LOAD c:/sysgcc/esp32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/
                 0x3f40b8f4                _thread_local_end = ABSOLUTE (.)
                 0x3f40b8f4                . = ALIGN (0x4)
 
-.flash.text     0x400d0018    0x143d0
+.flash.text     0x400d0018    0x143d4
                 0x400d0018                _stext = .
                 0x400d0018                _text_start = ABSOLUTE (.)
  *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
@@ -7801,828 +7801,828 @@ LOAD c:/sysgcc/esp32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/
                 0x400d2104                TLS3001_send_packet
  *fill*         0x400d2146        0x2 
  .text.blink_task
-                0x400d2148       0xab main/libmain.a(blink.c.obj)
-                                 0xdf (size before relaxing)
+                0x400d2148       0xaf main/libmain.a(blink.c.obj)
+                                 0xe3 (size before relaxing)
                 0x400d2148                blink_task
- *fill*         0x400d21f3        0x1 
+ *fill*         0x400d21f7        0x1 
  .text.SPI_init
-                0x400d21f4       0xad main/libmain.a(blink.c.obj)
+                0x400d21f8       0xad main/libmain.a(blink.c.obj)
                                  0xc5 (size before relaxing)
-                0x400d21f4                SPI_init
- *fill*         0x400d22a1        0x3 
+                0x400d21f8                SPI_init
+ *fill*         0x400d22a5        0x3 
  .text.app_main
-                0x400d22a4       0x2a main/libmain.a(blink.c.obj)
+                0x400d22a8       0x2a main/libmain.a(blink.c.obj)
                                  0x32 (size before relaxing)
-                0x400d22a4                app_main
- *fill*         0x400d22ce        0x2 
- .text          0x400d22d0       0x38 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-assert.o)
+                0x400d22a8                app_main
+ *fill*         0x400d22d2        0x2 
+ .text          0x400d22d4       0x38 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-assert.o)
                                  0x40 (size before relaxing)
-                0x400d22d0                __assert_func
-                0x400d22f8                __assert
- .text          0x400d2308       0x54 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fiprintf.o)
+                0x400d22d4                __assert_func
+                0x400d22fc                __assert
+ .text          0x400d230c       0x54 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fiprintf.o)
                                  0x5c (size before relaxing)
-                0x400d2308                _fiprintf_r
-                0x400d232c                fiprintf
- .text          0x400d235c       0xc0 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fopen.o)
+                0x400d230c                _fiprintf_r
+                0x400d2330                fiprintf
+ .text          0x400d2360       0xc0 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fopen.o)
                                  0xcc (size before relaxing)
-                0x400d235c                _fopen_r
-                0x400d2408                fopen
- .text          0x400d241c       0x2d C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fseek.o)
+                0x400d2360                _fopen_r
+                0x400d240c                fopen
+ .text          0x400d2420       0x2d C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fseek.o)
                                  0x31 (size before relaxing)
-                0x400d241c                _fseek_r
-                0x400d2434                fseek
- *fill*         0x400d2449        0x3 
- .text          0x400d244c      0x32e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fseeko.o)
+                0x400d2420                _fseek_r
+                0x400d2438                fseek
+ *fill*         0x400d244d        0x3 
+ .text          0x400d2450      0x32e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-fseeko.o)
                                 0x336 (size before relaxing)
-                0x400d244c                _fseeko_r
-                0x400d2764                fseeko
- *fill*         0x400d277a        0x2 
- .text          0x400d277c       0xd6 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-snprintf.o)
-                0x400d277c                _snprintf_r
-                0x400d27e4                snprintf
- *fill*         0x400d2852        0x2 
- .text          0x400d2854     0x357e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-svfprintf.o)
+                0x400d2450                _fseeko_r
+                0x400d2768                fseeko
+ *fill*         0x400d277e        0x2 
+ .text          0x400d2780       0xd6 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-snprintf.o)
+                0x400d2780                _snprintf_r
+                0x400d27e8                snprintf
+ *fill*         0x400d2856        0x2 
+ .text          0x400d2858     0x357e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-svfprintf.o)
                                0x35ca (size before relaxing)
-                0x400d2cd4                _svfprintf_r
- *fill*         0x400d5dd2        0x2 
- .text          0x400d5dd4     0x26a1 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vfiprintf.o)
+                0x400d2cd8                _svfprintf_r
+ *fill*         0x400d5dd6        0x2 
+ .text          0x400d5dd8     0x26a1 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vfiprintf.o)
                                0x26ad (size before relaxing)
-                0x400d6254                __sprint_r
-                0x400d62c0                _vfiprintf_r
-                0x400d83c0                vfiprintf
- *fill*         0x400d8475        0x3 
- .text          0x400d8478     0x3739 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vfprintf.o)
+                0x400d6258                __sprint_r
+                0x400d62c4                _vfiprintf_r
+                0x400d83c4                vfiprintf
+ *fill*         0x400d8479        0x3 
+ .text          0x400d847c     0x3739 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vfprintf.o)
                                0x3785 (size before relaxing)
-                0x400d88f8                _vfprintf_r
-                0x400dbafc                vfprintf
- *fill*         0x400dbbb1        0x3 
- .text          0x400dbbb4      0xd5a C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-dtoa.o)
+                0x400d88fc                _vfprintf_r
+                0x400dbb00                vfprintf
+ *fill*         0x400dbbb5        0x3 
+ .text          0x400dbbb8      0xd5a C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-dtoa.o)
                                 0xdae (size before relaxing)
-                0x400dbcc0                _dtoa_r
- *fill*         0x400dc90e        0x2 
- .text          0x400dc910       0x7f C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-flags.o)
-                0x400dc910                __sflags
- *fill*         0x400dc98f        0x1 
- .text          0x400dc990      0x82a C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-mprec.o)
+                0x400dbcc4                _dtoa_r
+ *fill*         0x400dc912        0x2 
+ .text          0x400dc914       0x7f C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-flags.o)
+                0x400dc914                __sflags
+ *fill*         0x400dc993        0x1 
+ .text          0x400dc994      0x82a C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-mprec.o)
                                 0x82e (size before relaxing)
-                0x400dc990                _Balloc
-                0x400dca04                _Bfree
-                0x400dca34                __multadd
-                0x400dcaa8                __s2b
-                0x400dcb28                __hi0bits
-                0x400dcb74                __lo0bits
-                0x400dcbe0                __i2b
-                0x400dcbf4                __multiply
-                0x400dccf8                __pow5mult
-                0x400dcd88                __lshift
-                0x400dce24                __mcmp
-                0x400dce60                __mdiff
-                0x400dcf24                __ulp
-                0x400dcf6c                __b2d
-                0x400dd010                __d2b
-                0x400dd0b0                __ratio
-                0x400dd104                _mprec_log10
-                0x400dd138                __copybits
-                0x400dd16c                __any_on
- *fill*         0x400dd1ba        0x2 
- .text          0x400dd1bc       0x62 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-s_frexp.o)
-                0x400dd1bc                frexp
- *fill*         0x400dd21e        0x2 
- .text          0x400dd220     0x2582 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-svfiprintf.o)
+                0x400dc994                _Balloc
+                0x400dca08                _Bfree
+                0x400dca38                __multadd
+                0x400dcaac                __s2b
+                0x400dcb2c                __hi0bits
+                0x400dcb78                __lo0bits
+                0x400dcbe4                __i2b
+                0x400dcbf8                __multiply
+                0x400dccfc                __pow5mult
+                0x400dcd8c                __lshift
+                0x400dce28                __mcmp
+                0x400dce64                __mdiff
+                0x400dcf28                __ulp
+                0x400dcf70                __b2d
+                0x400dd014                __d2b
+                0x400dd0b4                __ratio
+                0x400dd108                _mprec_log10
+                0x400dd13c                __copybits
+                0x400dd170                __any_on
+ *fill*         0x400dd1be        0x2 
+ .text          0x400dd1c0       0x62 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-s_frexp.o)
+                0x400dd1c0                frexp
+ *fill*         0x400dd222        0x2 
+ .text          0x400dd224     0x2582 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-svfiprintf.o)
                                0x2586 (size before relaxing)
-                0x400dd6a0                __ssprint_r
-                0x400dd7a8                _svfiprintf_r
- *fill*         0x400df7a2        0x2 
+                0x400dd6a4                __ssprint_r
+                0x400dd7ac                _svfiprintf_r
+ *fill*         0x400df7a6        0x2 
  .text.heap_bubble_down
-                0x400df7a4       0x4e log/liblog.a(log.c.obj)
- *fill*         0x400df7f2        0x2 
+                0x400df7a8       0x4e log/liblog.a(log.c.obj)
+ *fill*         0x400df7f6        0x2 
  .text.register_heap
-                0x400df7f4       0x14 heap/libheap.a(heap_caps_init.c.obj)
+                0x400df7f8       0x14 heap/libheap.a(heap_caps_init.c.obj)
  .text.heap_caps_enable_nonos_stack_heaps
-                0x400df808       0x28 heap/libheap.a(heap_caps_init.c.obj)
+                0x400df80c       0x28 heap/libheap.a(heap_caps_init.c.obj)
                                  0x2c (size before relaxing)
-                0x400df808                heap_caps_enable_nonos_stack_heaps
+                0x400df80c                heap_caps_enable_nonos_stack_heaps
  .text.heap_caps_init
-                0x400df830      0x282 heap/libheap.a(heap_caps_init.c.obj)
+                0x400df834      0x282 heap/libheap.a(heap_caps_init.c.obj)
                                 0x29a (size before relaxing)
-                0x400df830                heap_caps_init
- *fill*         0x400dfab2        0x2 
+                0x400df834                heap_caps_init
+ *fill*         0x400dfab6        0x2 
  .text.uart_tx_char
-                0x400dfab4       0x25 vfs/libvfs.a(vfs_uart.c.obj)
- *fill*         0x400dfad9        0x3 
+                0x400dfab8       0x25 vfs/libvfs.a(vfs_uart.c.obj)
+ *fill*         0x400dfadd        0x3 
  .text.uart_rx_char
-                0x400dfadc       0x21 vfs/libvfs.a(vfs_uart.c.obj)
- *fill*         0x400dfafd        0x3 
+                0x400dfae0       0x21 vfs/libvfs.a(vfs_uart.c.obj)
+ *fill*         0x400dfb01        0x3 
  .text.uart_read_char
-                0x400dfb00       0x28 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfb04       0x28 vfs/libvfs.a(vfs_uart.c.obj)
  .text.uart_end_select
-                0x400dfb28       0x80 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfb2c       0x80 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x8c (size before relaxing)
  .text.uart_start_select
-                0x400dfba8      0x1c0 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfbac      0x1c0 vfs/libvfs.a(vfs_uart.c.obj)
                                 0x1f4 (size before relaxing)
  .text.select_notif_callback
-                0x400dfd68       0xbe vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfd6c       0xbe vfs/libvfs.a(vfs_uart.c.obj)
                                  0xc2 (size before relaxing)
- *fill*         0x400dfe26        0x2 
+ *fill*         0x400dfe2a        0x2 
  .text.uart_tcflush
-                0x400dfe28       0x3a vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfe2c       0x3a vfs/libvfs.a(vfs_uart.c.obj)
                                  0x3e (size before relaxing)
- *fill*         0x400dfe62        0x2 
+ *fill*         0x400dfe66        0x2 
  .text.uart_tcdrain
-                0x400dfe64       0x2c vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfe68       0x2c vfs/libvfs.a(vfs_uart.c.obj)
                                  0x30 (size before relaxing)
  .text.uart_tcgetattr
-                0x400dfe90      0x376 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400dfe94      0x376 vfs/libvfs.a(vfs_uart.c.obj)
                                 0x382 (size before relaxing)
- *fill*         0x400e0206        0x2 
+ *fill*         0x400e020a        0x2 
  .text.uart_tcsetattr
-                0x400e0208      0x246 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e020c      0x246 vfs/libvfs.a(vfs_uart.c.obj)
                                 0x25e (size before relaxing)
- *fill*         0x400e044e        0x2 
+ *fill*         0x400e0452        0x2 
  .text.uart_access
-                0x400e0450       0x5a vfs/libvfs.a(vfs_uart.c.obj)
- *fill*         0x400e04aa        0x2 
+                0x400e0454       0x5a vfs/libvfs.a(vfs_uart.c.obj)
+ *fill*         0x400e04ae        0x2 
  .text.uart_open
-                0x400e04ac       0x59 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e04b0       0x59 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x5d (size before relaxing)
- *fill*         0x400e0505        0x3 
+ *fill*         0x400e0509        0x3 
  .text.uart_fcntl
-                0x400e0508       0x80 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e050c       0x80 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x84 (size before relaxing)
  .text.uart_fstat
-                0x400e0588       0x1e vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e058c       0x1e vfs/libvfs.a(vfs_uart.c.obj)
                                  0x21 (size before relaxing)
- *fill*         0x400e05a6        0x2 
+ *fill*         0x400e05aa        0x2 
  .text.uart_close
-                0x400e05a8       0x19 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e05ac       0x19 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x1c (size before relaxing)
- *fill*         0x400e05c1        0x3 
+ *fill*         0x400e05c5        0x3 
  .text.uart_return_char
-                0x400e05c4       0x27 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e05c8       0x27 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x2a (size before relaxing)
- *fill*         0x400e05eb        0x1 
+ *fill*         0x400e05ef        0x1 
  .text.uart_read
-                0x400e05ec       0x9e vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e05f0       0x9e vfs/libvfs.a(vfs_uart.c.obj)
                                  0xaa (size before relaxing)
- *fill*         0x400e068a        0x2 
+ *fill*         0x400e068e        0x2 
  .text.uart_write
-                0x400e068c       0x6d vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e0690       0x6d vfs/libvfs.a(vfs_uart.c.obj)
                                  0x75 (size before relaxing)
- *fill*         0x400e06f9        0x3 
+ *fill*         0x400e06fd        0x3 
  .text.esp_vfs_dev_uart_register
-                0x400e06fc       0x78 vfs/libvfs.a(vfs_uart.c.obj)
+                0x400e0700       0x78 vfs/libvfs.a(vfs_uart.c.obj)
                                  0x7c (size before relaxing)
-                0x400e06fc                esp_vfs_dev_uart_register
+                0x400e0700                esp_vfs_dev_uart_register
  .text.get_vfs_for_fd
-                0x400e0774       0x38 vfs/libvfs.a(vfs.c.obj)
+                0x400e0778       0x38 vfs/libvfs.a(vfs.c.obj)
  .text.esp_vfs_register_common
-                0x400e07ac       0xf1 vfs/libvfs.a(vfs.c.obj)
- *fill*         0x400e089d        0x3 
+                0x400e07b0       0xf1 vfs/libvfs.a(vfs.c.obj)
+ *fill*         0x400e08a1        0x3 
  .text.get_vfs_for_path
-                0x400e08a0       0x70 vfs/libvfs.a(vfs.c.obj)
+                0x400e08a4       0x70 vfs/libvfs.a(vfs.c.obj)
  .text.translate_path
-                0x400e0910       0x3d vfs/libvfs.a(vfs.c.obj)
- *fill*         0x400e094d        0x3 
+                0x400e0914       0x3d vfs/libvfs.a(vfs.c.obj)
+ *fill*         0x400e0951        0x3 
  .text.esp_vfs_register
-                0x400e0950       0x1c vfs/libvfs.a(vfs.c.obj)
+                0x400e0954       0x1c vfs/libvfs.a(vfs.c.obj)
                                  0x20 (size before relaxing)
-                0x400e0950                esp_vfs_register
+                0x400e0954                esp_vfs_register
  .text.esp_vfs_open
-                0x400e096c       0xc9 vfs/libvfs.a(vfs.c.obj)
+                0x400e0970       0xc9 vfs/libvfs.a(vfs.c.obj)
                                  0xd1 (size before relaxing)
-                0x400e096c                esp_vfs_open
- *fill*         0x400e0a35        0x3 
+                0x400e0970                esp_vfs_open
+ *fill*         0x400e0a39        0x3 
  .text.esp_vfs_write
-                0x400e0a38       0x6a vfs/libvfs.a(vfs.c.obj)
+                0x400e0a3c       0x6a vfs/libvfs.a(vfs.c.obj)
                                  0x6e (size before relaxing)
-                0x400e0a38                esp_vfs_write
- *fill*         0x400e0aa2        0x2 
+                0x400e0a3c                esp_vfs_write
+ *fill*         0x400e0aa6        0x2 
  .text.esp_vfs_lseek
-                0x400e0aa4       0x6a vfs/libvfs.a(vfs.c.obj)
+                0x400e0aa8       0x6a vfs/libvfs.a(vfs.c.obj)
                                  0x6e (size before relaxing)
-                0x400e0aa4                esp_vfs_lseek
- *fill*         0x400e0b0e        0x2 
+                0x400e0aa8                esp_vfs_lseek
+ *fill*         0x400e0b12        0x2 
  .text.esp_vfs_read
-                0x400e0b10       0x6a vfs/libvfs.a(vfs.c.obj)
+                0x400e0b14       0x6a vfs/libvfs.a(vfs.c.obj)
                                  0x6e (size before relaxing)
-                0x400e0b10                esp_vfs_read
- *fill*         0x400e0b7a        0x2 
+                0x400e0b14                esp_vfs_read
+ *fill*         0x400e0b7e        0x2 
  .text.esp_vfs_close
-                0x400e0b7c       0x98 vfs/libvfs.a(vfs.c.obj)
+                0x400e0b80       0x98 vfs/libvfs.a(vfs.c.obj)
                                  0x9f (size before relaxing)
-                0x400e0b7c                esp_vfs_close
- *fill*         0x400e0c14        0x0 
+                0x400e0b80                esp_vfs_close
+ *fill*         0x400e0c18        0x0 
  .text.esp_vfs_fstat
-                0x400e0c14       0x68 vfs/libvfs.a(vfs.c.obj)
+                0x400e0c18       0x68 vfs/libvfs.a(vfs.c.obj)
                                  0x6c (size before relaxing)
-                0x400e0c14                esp_vfs_fstat
+                0x400e0c18                esp_vfs_fstat
  .text.esp_vfs_stat
-                0x400e0c7c       0x45 vfs/libvfs.a(vfs.c.obj)
+                0x400e0c80       0x45 vfs/libvfs.a(vfs.c.obj)
                                  0x49 (size before relaxing)
-                0x400e0c7c                esp_vfs_stat
- *fill*         0x400e0cc1        0x3 
+                0x400e0c80                esp_vfs_stat
+ *fill*         0x400e0cc5        0x3 
  .text.esp_vfs_link
-                0x400e0cc4       0x64 vfs/libvfs.a(vfs.c.obj)
+                0x400e0cc8       0x64 vfs/libvfs.a(vfs.c.obj)
                                  0x6c (size before relaxing)
-                0x400e0cc4                esp_vfs_link
+                0x400e0cc8                esp_vfs_link
  .text.esp_vfs_unlink
-                0x400e0d28       0x40 vfs/libvfs.a(vfs.c.obj)
+                0x400e0d2c       0x40 vfs/libvfs.a(vfs.c.obj)
                                  0x44 (size before relaxing)
-                0x400e0d28                esp_vfs_unlink
+                0x400e0d2c                esp_vfs_unlink
  .text.esp_vfs_rename
-                0x400e0d68       0x64 vfs/libvfs.a(vfs.c.obj)
+                0x400e0d6c       0x64 vfs/libvfs.a(vfs.c.obj)
                                  0x6c (size before relaxing)
-                0x400e0d68                esp_vfs_rename
+                0x400e0d6c                esp_vfs_rename
  .text.esp_vfs_select_triggered
-                0x400e0dcc       0x42 vfs/libvfs.a(vfs.c.obj)
-                0x400e0dcc                esp_vfs_select_triggered
- *fill*         0x400e0e0e        0x2 
+                0x400e0dd0       0x42 vfs/libvfs.a(vfs.c.obj)
+                0x400e0dd0                esp_vfs_select_triggered
+ *fill*         0x400e0e12        0x2 
  .text.esp_vfs_select_triggered_isr
-                0x400e0e10       0x40 vfs/libvfs.a(vfs.c.obj)
-                0x400e0e10                esp_vfs_select_triggered_isr
+                0x400e0e14       0x40 vfs/libvfs.a(vfs.c.obj)
+                0x400e0e14                esp_vfs_select_triggered_isr
  .text.raise_r_stub
-                0x400e0e50        0xf newlib/libnewlib.a(syscall_table.c.obj)
- *fill*         0x400e0e5f        0x1 
+                0x400e0e54        0xf newlib/libnewlib.a(syscall_table.c.obj)
+ *fill*         0x400e0e63        0x1 
  .text.esp_setup_syscall_table
-                0x400e0e60       0x2b newlib/libnewlib.a(syscall_table.c.obj)
-                0x400e0e60                esp_setup_syscall_table
- *fill*         0x400e0e8b        0x1 
+                0x400e0e64       0x2b newlib/libnewlib.a(syscall_table.c.obj)
+                0x400e0e64                esp_setup_syscall_table
+ *fill*         0x400e0e8f        0x1 
  .text._raise_r
-                0x400e0e8c        0x6 newlib/libnewlib.a(syscalls.c.obj)
+                0x400e0e90        0x6 newlib/libnewlib.a(syscalls.c.obj)
                                   0x9 (size before relaxing)
-                0x400e0e8c                _raise_r
- *fill*         0x400e0e92        0x2 
- .text._sbrk_r  0x400e0e94        0x6 newlib/libnewlib.a(syscalls.c.obj)
+                0x400e0e90                _raise_r
+ *fill*         0x400e0e96        0x2 
+ .text._sbrk_r  0x400e0e98        0x6 newlib/libnewlib.a(syscalls.c.obj)
                                   0x9 (size before relaxing)
-                0x400e0e94                _sbrk_r
- *fill*         0x400e0e9a        0x2 
+                0x400e0e98                _sbrk_r
+ *fill*         0x400e0e9e        0x2 
  .text.get_boot_time
-                0x400e0e9c       0x23 newlib/libnewlib.a(time.c.obj)
+                0x400e0ea0       0x23 newlib/libnewlib.a(time.c.obj)
                                  0x27 (size before relaxing)
- *fill*         0x400e0ebf        0x1 
+ *fill*         0x400e0ec3        0x1 
  .text.set_boot_time
-                0x400e0ec0       0x24 newlib/libnewlib.a(time.c.obj)
+                0x400e0ec4       0x24 newlib/libnewlib.a(time.c.obj)
                                  0x28 (size before relaxing)
  .text.get_time_since_boot
-                0x400e0ee4       0x1f newlib/libnewlib.a(time.c.obj)
- *fill*         0x400e0f03        0x1 
+                0x400e0ee8       0x1f newlib/libnewlib.a(time.c.obj)
+ *fill*         0x400e0f07        0x1 
  .text.adjust_boot_time
-                0x400e0f04      0x12a newlib/libnewlib.a(time.c.obj)
+                0x400e0f08      0x12a newlib/libnewlib.a(time.c.obj)
                                 0x12e (size before relaxing)
- *fill*         0x400e102e        0x2 
+ *fill*         0x400e1032        0x2 
  .text.get_adjusted_boot_time
-                0x400e1030       0x1e newlib/libnewlib.a(time.c.obj)
+                0x400e1034       0x1e newlib/libnewlib.a(time.c.obj)
                                  0x26 (size before relaxing)
- *fill*         0x400e104e        0x2 
+ *fill*         0x400e1052        0x2 
  .text.esp_clk_slowclk_cal_set
-                0x400e1050       0x6a newlib/libnewlib.a(time.c.obj)
+                0x400e1054       0x6a newlib/libnewlib.a(time.c.obj)
                                  0x6e (size before relaxing)
-                0x400e1050                esp_clk_slowclk_cal_set
- *fill*         0x400e10ba        0x2 
+                0x400e1054                esp_clk_slowclk_cal_set
+ *fill*         0x400e10be        0x2 
  .text.esp_clk_slowclk_cal_get
-                0x400e10bc        0xd newlib/libnewlib.a(time.c.obj)
-                0x400e10bc                esp_clk_slowclk_cal_get
- *fill*         0x400e10c9        0x3 
+                0x400e10c0        0xd newlib/libnewlib.a(time.c.obj)
+                0x400e10c0                esp_clk_slowclk_cal_get
+ *fill*         0x400e10cd        0x3 
  .text.get_rtc_time_us
-                0x400e10cc       0x43 newlib/libnewlib.a(time.c.obj)
+                0x400e10d0       0x43 newlib/libnewlib.a(time.c.obj)
                                  0x47 (size before relaxing)
- *fill*         0x400e110f        0x1 
+ *fill*         0x400e1113        0x1 
  .text.esp_set_time_from_rtc
-                0x400e1110       0x27 newlib/libnewlib.a(time.c.obj)
+                0x400e1114       0x27 newlib/libnewlib.a(time.c.obj)
                                  0x2f (size before relaxing)
-                0x400e1110                esp_set_time_from_rtc
- *fill*         0x400e1137        0x1 
+                0x400e1114                esp_set_time_from_rtc
+ *fill*         0x400e113b        0x1 
  .text.gpio_output_disable
-                0x400e1138       0xa4 driver/libdriver.a(gpio.c.obj)
+                0x400e113c       0xa4 driver/libdriver.a(gpio.c.obj)
                                  0xac (size before relaxing)
  .text.gpio_output_enable
-                0x400e11dc       0x8a driver/libdriver.a(gpio.c.obj)
+                0x400e11e0       0x8a driver/libdriver.a(gpio.c.obj)
                                  0x8e (size before relaxing)
- *fill*         0x400e1266        0x2 
+ *fill*         0x400e126a        0x2 
  .text.gpio_set_level
-                0x400e1268       0xbd driver/libdriver.a(gpio.c.obj)
+                0x400e126c       0xbd driver/libdriver.a(gpio.c.obj)
                                  0xc1 (size before relaxing)
-                0x400e1268                gpio_set_level
- *fill*         0x400e1325        0x3 
+                0x400e126c                gpio_set_level
+ *fill*         0x400e1329        0x3 
  .text.gpio_set_direction
-                0x400e1328      0x160 driver/libdriver.a(gpio.c.obj)
+                0x400e132c      0x160 driver/libdriver.a(gpio.c.obj)
                                 0x178 (size before relaxing)
-                0x400e1328                gpio_set_direction
+                0x400e132c                gpio_set_direction
  .text.gpio_iomux_in
-                0x400e1488       0x7b driver/libdriver.a(gpio.c.obj)
+                0x400e148c       0x7b driver/libdriver.a(gpio.c.obj)
                                  0x83 (size before relaxing)
-                0x400e1488                gpio_iomux_in
- *fill*         0x400e1503        0x1 
+                0x400e148c                gpio_iomux_in
+ *fill*         0x400e1507        0x1 
  .text.gpio_iomux_out
-                0x400e1504       0xa3 driver/libdriver.a(gpio.c.obj)
+                0x400e1508       0xa3 driver/libdriver.a(gpio.c.obj)
                                  0xab (size before relaxing)
-                0x400e1504                gpio_iomux_out
- *fill*         0x400e15a7        0x1 
+                0x400e1508                gpio_iomux_out
+ *fill*         0x400e15ab        0x1 
  .text.get_clk_en_mask
-                0x400e15a8       0xbb driver/libdriver.a(periph_ctrl.c.obj)
- *fill*         0x400e1663        0x1 
+                0x400e15ac       0xbb driver/libdriver.a(periph_ctrl.c.obj)
+ *fill*         0x400e1667        0x1 
  .text.get_rst_en_mask
-                0x400e1664       0xb8 driver/libdriver.a(periph_ctrl.c.obj)
+                0x400e1668       0xb8 driver/libdriver.a(periph_ctrl.c.obj)
  .text.get_clk_en_reg
-                0x400e171c       0x22 driver/libdriver.a(periph_ctrl.c.obj)
- *fill*         0x400e173e        0x2 
+                0x400e1720       0x22 driver/libdriver.a(periph_ctrl.c.obj)
+ *fill*         0x400e1742        0x2 
  .text.get_rst_en_reg
-                0x400e1740       0x22 driver/libdriver.a(periph_ctrl.c.obj)
- *fill*         0x400e1762        0x2 
+                0x400e1744       0x22 driver/libdriver.a(periph_ctrl.c.obj)
+ *fill*         0x400e1766        0x2 
  .text.periph_module_enable
-                0x400e1764       0x4b driver/libdriver.a(periph_ctrl.c.obj)
+                0x400e1768       0x4b driver/libdriver.a(periph_ctrl.c.obj)
                                  0x63 (size before relaxing)
-                0x400e1764                periph_module_enable
- *fill*         0x400e17af        0x1 
+                0x400e1768                periph_module_enable
+ *fill*         0x400e17b3        0x1 
  .text.periph_module_disable
-                0x400e17b0       0x4b driver/libdriver.a(periph_ctrl.c.obj)
+                0x400e17b4       0x4b driver/libdriver.a(periph_ctrl.c.obj)
                                  0x63 (size before relaxing)
-                0x400e17b0                periph_module_disable
- *fill*         0x400e17fb        0x1 
+                0x400e17b4                periph_module_disable
+ *fill*         0x400e17ff        0x1 
  .text.periph_module_reset
-                0x400e17fc       0x43 driver/libdriver.a(periph_ctrl.c.obj)
+                0x400e1800       0x43 driver/libdriver.a(periph_ctrl.c.obj)
                                  0x53 (size before relaxing)
-                0x400e17fc                periph_module_reset
- *fill*         0x400e183f        0x1 
- .text.rtc_isr  0x400e1840       0x4a driver/libdriver.a(rtc_module.c.obj)
+                0x400e1800                periph_module_reset
+ *fill*         0x400e1843        0x1 
+ .text.rtc_isr  0x400e1844       0x4a driver/libdriver.a(rtc_module.c.obj)
                                  0x56 (size before relaxing)
- *fill*         0x400e188a        0x2 
+ *fill*         0x400e188e        0x2 
  .text.rtc_isr_ensure_installed
-                0x400e188c       0x43 driver/libdriver.a(rtc_module.c.obj)
+                0x400e1890       0x43 driver/libdriver.a(rtc_module.c.obj)
                                  0x4a (size before relaxing)
- *fill*         0x400e18cf        0x1 
+ *fill*         0x400e18d3        0x1 
  .text.rtc_gpio_force_hold_dis_all
-                0x400e18d0       0x39 driver/libdriver.a(rtc_module.c.obj)
-                0x400e18d0                rtc_gpio_force_hold_dis_all
- *fill*         0x400e1909        0x3 
+                0x400e18d4       0x39 driver/libdriver.a(rtc_module.c.obj)
+                0x400e18d4                rtc_gpio_force_hold_dis_all
+ *fill*         0x400e190d        0x3 
  .text.rtc_isr_register
-                0x400e190c       0x41 driver/libdriver.a(rtc_module.c.obj)
+                0x400e1910       0x41 driver/libdriver.a(rtc_module.c.obj)
                                  0x49 (size before relaxing)
-                0x400e190c                rtc_isr_register
- *fill*         0x400e194d        0x3 
+                0x400e1910                rtc_isr_register
+ *fill*         0x400e1951        0x3 
  .text.spi_bus_initialize
-                0x400e1950      0x38e driver/libdriver.a(spi_master.c.obj)
+                0x400e1954      0x38e driver/libdriver.a(spi_master.c.obj)
                                 0x3ca (size before relaxing)
-                0x400e1950                spi_bus_initialize
- *fill*         0x400e1cde        0x2 
+                0x400e1954                spi_bus_initialize
+ *fill*         0x400e1ce2        0x2 
  .text.spi_get_timing
-                0x400e1ce0       0x5c driver/libdriver.a(spi_master.c.obj)
-                0x400e1ce0                spi_get_timing
+                0x400e1ce4       0x5c driver/libdriver.a(spi_master.c.obj)
+                0x400e1ce4                spi_get_timing
  .text.spi_get_freq_limit
-                0x400e1d3c       0x32 driver/libdriver.a(spi_master.c.obj)
-                0x400e1d3c                spi_get_freq_limit
- *fill*         0x400e1d6e        0x2 
+                0x400e1d40       0x32 driver/libdriver.a(spi_master.c.obj)
+                0x400e1d40                spi_get_freq_limit
+ *fill*         0x400e1d72        0x2 
  .text.spi_cal_clock
-                0x400e1d70      0x182 driver/libdriver.a(spi_master.c.obj)
+                0x400e1d74      0x182 driver/libdriver.a(spi_master.c.obj)
                                 0x186 (size before relaxing)
-                0x400e1d70                spi_cal_clock
- *fill*         0x400e1ef2        0x2 
+                0x400e1d74                spi_cal_clock
+ *fill*         0x400e1ef6        0x2 
  .text.spi_bus_add_device
-                0x400e1ef4      0x406 driver/libdriver.a(spi_master.c.obj)
+                0x400e1ef8      0x406 driver/libdriver.a(spi_master.c.obj)
                                 0x451 (size before relaxing)
-                0x400e1ef4                spi_bus_add_device
- *fill*         0x400e22fa        0x2 
+                0x400e1ef8                spi_bus_add_device
+ *fill*         0x400e22fe        0x2 
  .text.spi_device_queue_trans
-                0x400e22fc       0xbc driver/libdriver.a(spi_master.c.obj)
+                0x400e2300       0xbc driver/libdriver.a(spi_master.c.obj)
                                  0xc8 (size before relaxing)
-                0x400e22fc                spi_device_queue_trans
+                0x400e2300                spi_device_queue_trans
  .text.spi_device_get_trans_result
-                0x400e23b8       0x49 driver/libdriver.a(spi_master.c.obj)
+                0x400e23bc       0x49 driver/libdriver.a(spi_master.c.obj)
                                  0x55 (size before relaxing)
-                0x400e23b8                spi_device_get_trans_result
- *fill*         0x400e2401        0x3 
+                0x400e23bc                spi_device_get_trans_result
+ *fill*         0x400e2405        0x3 
  .text.spi_device_transmit
-                0x400e2404       0x3c driver/libdriver.a(spi_master.c.obj)
+                0x400e2408       0x3c driver/libdriver.a(spi_master.c.obj)
                                  0x44 (size before relaxing)
-                0x400e2404                spi_device_transmit
+                0x400e2408                spi_device_transmit
  .text.spi_device_acquire_bus
-                0x400e2440       0xe0 driver/libdriver.a(spi_master.c.obj)
+                0x400e2444       0xe0 driver/libdriver.a(spi_master.c.obj)
                                  0xfc (size before relaxing)
-                0x400e2440                spi_device_acquire_bus
+                0x400e2444                spi_device_acquire_bus
  .text.timer_group_intr_enable
-                0x400e2520       0x58 driver/libdriver.a(timer.c.obj)
+                0x400e2524       0x58 driver/libdriver.a(timer.c.obj)
                                  0x64 (size before relaxing)
-                0x400e2520                timer_group_intr_enable
+                0x400e2524                timer_group_intr_enable
  .text.uart_pattern_queue_update
-                0x400e2578       0x86 driver/libdriver.a(uart.c.obj)
+                0x400e257c       0x86 driver/libdriver.a(uart.c.obj)
                                  0x8e (size before relaxing)
- *fill*         0x400e25fe        0x2 
+ *fill*         0x400e2602        0x2 
  .text.uart_reset_rx_fifo
-                0x400e2600       0x9c driver/libdriver.a(uart.c.obj)
+                0x400e2604       0x9c driver/libdriver.a(uart.c.obj)
                                  0xa4 (size before relaxing)
  .text.uart_set_word_length
-                0x400e269c       0x8a driver/libdriver.a(uart.c.obj)
+                0x400e26a0       0x8a driver/libdriver.a(uart.c.obj)
                                  0x96 (size before relaxing)
-                0x400e269c                uart_set_word_length
- *fill*         0x400e2726        0x2 
+                0x400e26a0                uart_set_word_length
+ *fill*         0x400e272a        0x2 
  .text.uart_get_word_length
-                0x400e2728       0x42 driver/libdriver.a(uart.c.obj)
+                0x400e272c       0x42 driver/libdriver.a(uart.c.obj)
                                  0x46 (size before relaxing)
-                0x400e2728                uart_get_word_length
- *fill*         0x400e276a        0x2 
+                0x400e272c                uart_get_word_length
+ *fill*         0x400e276e        0x2 
  .text.uart_set_stop_bits
-                0x400e276c       0xc9 driver/libdriver.a(uart.c.obj)
+                0x400e2770       0xc9 driver/libdriver.a(uart.c.obj)
                                  0xd1 (size before relaxing)
-                0x400e276c                uart_set_stop_bits
- *fill*         0x400e2835        0x3 
+                0x400e2770                uart_set_stop_bits
+ *fill*         0x400e2839        0x3 
  .text.uart_get_stop_bits
-                0x400e2838       0x5e driver/libdriver.a(uart.c.obj)
+                0x400e283c       0x5e driver/libdriver.a(uart.c.obj)
                                  0x62 (size before relaxing)
-                0x400e2838                uart_get_stop_bits
- *fill*         0x400e2896        0x2 
+                0x400e283c                uart_get_stop_bits
+ *fill*         0x400e289a        0x2 
  .text.uart_set_parity
-                0x400e2898       0x79 driver/libdriver.a(uart.c.obj)
+                0x400e289c       0x79 driver/libdriver.a(uart.c.obj)
                                  0x81 (size before relaxing)
-                0x400e2898                uart_set_parity
- *fill*         0x400e2911        0x3 
+                0x400e289c                uart_set_parity
+ *fill*         0x400e2915        0x3 
  .text.uart_get_parity
-                0x400e2914       0x56 driver/libdriver.a(uart.c.obj)
+                0x400e2918       0x56 driver/libdriver.a(uart.c.obj)
                                  0x5a (size before relaxing)
-                0x400e2914                uart_get_parity
- *fill*         0x400e296a        0x2 
+                0x400e2918                uart_get_parity
+ *fill*         0x400e296e        0x2 
  .text.uart_set_baudrate
-                0x400e296c       0xa3 driver/libdriver.a(uart.c.obj)
+                0x400e2970       0xa3 driver/libdriver.a(uart.c.obj)
                                  0xae (size before relaxing)
-                0x400e296c                uart_set_baudrate
- *fill*         0x400e2a0f        0x1 
+                0x400e2970                uart_set_baudrate
+ *fill*         0x400e2a13        0x1 
  .text.uart_get_baudrate
-                0x400e2a10       0x7a driver/libdriver.a(uart.c.obj)
+                0x400e2a14       0x7a driver/libdriver.a(uart.c.obj)
                                  0x86 (size before relaxing)
-                0x400e2a10                uart_get_baudrate
- *fill*         0x400e2a8a        0x2 
+                0x400e2a14                uart_get_baudrate
+ *fill*         0x400e2a8e        0x2 
  .text.uart_enable_intr_mask
-                0x400e2a8c      0x18a driver/libdriver.a(uart.c.obj)
+                0x400e2a90      0x18a driver/libdriver.a(uart.c.obj)
                                 0x1a2 (size before relaxing)
-                0x400e2a8c                uart_enable_intr_mask
- *fill*         0x400e2c16        0x2 
+                0x400e2a90                uart_enable_intr_mask
+ *fill*         0x400e2c1a        0x2 
  .text.uart_disable_intr_mask
-                0x400e2c18       0xf0 driver/libdriver.a(uart.c.obj)
+                0x400e2c1c       0xf0 driver/libdriver.a(uart.c.obj)
                                 0x100 (size before relaxing)
-                0x400e2c18                uart_disable_intr_mask
+                0x400e2c1c                uart_disable_intr_mask
  .text.uart_enable_rx_intr
-                0x400e2d08       0x12 driver/libdriver.a(uart.c.obj)
-                0x400e2d08                uart_enable_rx_intr
- *fill*         0x400e2d1a        0x2 
+                0x400e2d0c       0x12 driver/libdriver.a(uart.c.obj)
+                0x400e2d0c                uart_enable_rx_intr
+ *fill*         0x400e2d1e        0x2 
  .text.uart_disable_rx_intr
-                0x400e2d1c       0x12 driver/libdriver.a(uart.c.obj)
-                0x400e2d1c                uart_disable_rx_intr
- *fill*         0x400e2d2e        0x2 
+                0x400e2d20       0x12 driver/libdriver.a(uart.c.obj)
+                0x400e2d20                uart_disable_rx_intr
+ *fill*         0x400e2d32        0x2 
  .text.uart_wait_tx_done
-                0x400e2d30      0x121 driver/libdriver.a(uart.c.obj)
+                0x400e2d34      0x121 driver/libdriver.a(uart.c.obj)
                                 0x14d (size before relaxing)
-                0x400e2d30                uart_wait_tx_done
- *fill*         0x400e2e51        0x3 
+                0x400e2d34                uart_wait_tx_done
+ *fill*         0x400e2e55        0x3 
  .text.uart_get_buffered_data_len
-                0x400e2e54       0x64 driver/libdriver.a(uart.c.obj)
+                0x400e2e58       0x64 driver/libdriver.a(uart.c.obj)
                                  0x6c (size before relaxing)
-                0x400e2e54                uart_get_buffered_data_len
+                0x400e2e58                uart_get_buffered_data_len
  .text.uart_flush_input
-                0x400e2eb8      0x19f driver/libdriver.a(uart.c.obj)
+                0x400e2ebc      0x19f driver/libdriver.a(uart.c.obj)
                                 0x1e3 (size before relaxing)
-                0x400e2eb8                uart_flush
-                0x400e2eb8                uart_flush_input
- *fill*         0x400e3057        0x1 
+                0x400e2ebc                uart_flush
+                0x400e2ebc                uart_flush_input
+ *fill*         0x400e305b        0x1 
  .text.uart_set_select_notif_callback
-                0x400e3058       0x16 driver/libdriver.a(uart.c.obj)
-                0x400e3058                uart_set_select_notif_callback
- *fill*         0x400e306e        0x2 
+                0x400e305c       0x16 driver/libdriver.a(uart.c.obj)
+                0x400e305c                uart_set_select_notif_callback
+ *fill*         0x400e3072        0x2 
  .text.uart_get_selectlock
-                0x400e3070        0x8 driver/libdriver.a(uart.c.obj)
-                0x400e3070                uart_get_selectlock
+                0x400e3074        0x8 driver/libdriver.a(uart.c.obj)
+                0x400e3074                uart_get_selectlock
  .text.spicommon_periph_claim
-                0x400e3078       0x7e driver/libdriver.a(spi_common.c.obj)
-                0x400e3078                spicommon_periph_claim
- *fill*         0x400e30f6        0x2 
+                0x400e307c       0x7e driver/libdriver.a(spi_common.c.obj)
+                0x400e307c                spicommon_periph_claim
+ *fill*         0x400e30fa        0x2 
  .text.spicommon_periph_free
-                0x400e30f8       0x80 driver/libdriver.a(spi_common.c.obj)
-                0x400e30f8                spicommon_periph_free
+                0x400e30fc       0x80 driver/libdriver.a(spi_common.c.obj)
+                0x400e30fc                spicommon_periph_free
  .text.spicommon_irqsource_for_host
-                0x400e3178       0x10 driver/libdriver.a(spi_common.c.obj)
-                0x400e3178                spicommon_irqsource_for_host
+                0x400e317c       0x10 driver/libdriver.a(spi_common.c.obj)
+                0x400e317c                spicommon_irqsource_for_host
  .text.spicommon_hw_for_host
-                0x400e3188        0xf driver/libdriver.a(spi_common.c.obj)
-                0x400e3188                spicommon_hw_for_host
- *fill*         0x400e3197        0x1 
+                0x400e318c        0xf driver/libdriver.a(spi_common.c.obj)
+                0x400e318c                spicommon_hw_for_host
+ *fill*         0x400e319b        0x1 
  .text.spicommon_dma_chan_claim
-                0x400e3198       0x4f driver/libdriver.a(spi_common.c.obj)
+                0x400e319c       0x4f driver/libdriver.a(spi_common.c.obj)
                                  0x57 (size before relaxing)
-                0x400e3198                spicommon_dma_chan_claim
- *fill*         0x400e31e7        0x1 
+                0x400e319c                spicommon_dma_chan_claim
+ *fill*         0x400e31eb        0x1 
  .text.spicommon_dma_chan_free
-                0x400e31e8       0x6a driver/libdriver.a(spi_common.c.obj)
+                0x400e31ec       0x6a driver/libdriver.a(spi_common.c.obj)
                                  0x75 (size before relaxing)
-                0x400e31e8                spicommon_dma_chan_free
- *fill*         0x400e3252        0x2 
+                0x400e31ec                spicommon_dma_chan_free
+ *fill*         0x400e3256        0x2 
  .text.spicommon_bus_initialize_io
-                0x400e3254      0x782 driver/libdriver.a(spi_common.c.obj)
+                0x400e3258      0x782 driver/libdriver.a(spi_common.c.obj)
                                 0x82a (size before relaxing)
-                0x400e3254                spicommon_bus_initialize_io
- *fill*         0x400e39d6        0x2 
+                0x400e3258                spicommon_bus_initialize_io
+ *fill*         0x400e39da        0x2 
  .text.spicommon_cs_initialize
-                0x400e39d8       0xd1 driver/libdriver.a(spi_common.c.obj)
+                0x400e39dc       0xd1 driver/libdriver.a(spi_common.c.obj)
                                  0xe1 (size before relaxing)
-                0x400e39d8                spicommon_cs_initialize
- *fill*         0x400e3aa9        0x3 
+                0x400e39dc                spicommon_cs_initialize
+ *fill*         0x400e3aad        0x3 
  .text.spi_flash_init_lock
-                0x400e3aac       0x22 spi_flash/libspi_flash.a(cache_utils.c.obj)
+                0x400e3ab0       0x22 spi_flash/libspi_flash.a(cache_utils.c.obj)
                                  0x26 (size before relaxing)
-                0x400e3aac                spi_flash_init_lock
- *fill*         0x400e3ace        0x2 
+                0x400e3ab0                spi_flash_init_lock
+ *fill*         0x400e3ad2        0x2 
  .text.spi_flash_op_lock
-                0x400e3ad0       0x12 spi_flash/libspi_flash.a(cache_utils.c.obj)
-                0x400e3ad0                spi_flash_op_lock
- *fill*         0x400e3ae2        0x2 
+                0x400e3ad4       0x12 spi_flash/libspi_flash.a(cache_utils.c.obj)
+                0x400e3ad4                spi_flash_op_lock
+ *fill*         0x400e3ae6        0x2 
  .text.spi_flash_op_unlock
-                0x400e3ae4        0xd spi_flash/libspi_flash.a(cache_utils.c.obj)
+                0x400e3ae8        0xd spi_flash/libspi_flash.a(cache_utils.c.obj)
                                  0x10 (size before relaxing)
-                0x400e3ae4                spi_flash_op_unlock
- *fill*         0x400e3af1        0x3 
+                0x400e3ae8                spi_flash_op_unlock
+ *fill*         0x400e3af5        0x3 
  .text.is_safe_write_address
-                0x400e3af4       0x32 spi_flash/libspi_flash.a(flash_ops.c.obj)
+                0x400e3af8       0x32 spi_flash/libspi_flash.a(flash_ops.c.obj)
                                  0x3a (size before relaxing)
- *fill*         0x400e3b26        0x2 
+ *fill*         0x400e3b2a        0x2 
  .text.spi_flash_init
-                0x400e3b28        0x8 spi_flash/libspi_flash.a(flash_ops.c.obj)
+                0x400e3b2c        0x8 spi_flash/libspi_flash.a(flash_ops.c.obj)
                                   0xb (size before relaxing)
-                0x400e3b28                spi_flash_init
- *fill*         0x400e3b30        0x0 
+                0x400e3b2c                spi_flash_init
+ *fill*         0x400e3b34        0x0 
  .text.spi_flash_cache2phys
-                0x400e3b30       0x62 spi_flash/libspi_flash.a(flash_mmap.c.obj)
-                0x400e3b30                spi_flash_cache2phys
- *fill*         0x400e3b92        0x2 
+                0x400e3b34       0x62 spi_flash/libspi_flash.a(flash_mmap.c.obj)
+                0x400e3b34                spi_flash_cache2phys
+ *fill*         0x400e3b96        0x2 
  .text.esp_pthread_cfg_key_destructor
-                0x400e3b94        0xe pthread/libpthread.a(pthread.c.obj)
- *fill*         0x400e3ba2        0x2 
+                0x400e3b98        0xe pthread/libpthread.a(pthread.c.obj)
+ *fill*         0x400e3ba6        0x2 
  .text.esp_pthread_init
-                0x400e3ba4       0x32 pthread/libpthread.a(pthread.c.obj)
+                0x400e3ba8       0x32 pthread/libpthread.a(pthread.c.obj)
                                  0x3a (size before relaxing)
-                0x400e3ba4                esp_pthread_init
- *fill*         0x400e3bd6        0x2 
+                0x400e3ba8                esp_pthread_init
+ *fill*         0x400e3bda        0x2 
  .text.find_key
-                0x400e3bd8       0x28 pthread/libpthread.a(pthread_local_storage.c.obj)
+                0x400e3bdc       0x28 pthread/libpthread.a(pthread_local_storage.c.obj)
                                  0x2b (size before relaxing)
- *fill*         0x400e3c00        0x0 
+ *fill*         0x400e3c04        0x0 
  .text.pthread_key_create
-                0x400e3c00       0x46 pthread/libpthread.a(pthread_local_storage.c.obj)
+                0x400e3c04       0x46 pthread/libpthread.a(pthread_local_storage.c.obj)
                                  0x4a (size before relaxing)
-                0x400e3c00                pthread_key_create
- *fill*         0x400e3c46        0x2 
+                0x400e3c04                pthread_key_create
+ *fill*         0x400e3c4a        0x2 
  .text.pthread_key_delete
-                0x400e3c48       0x3e pthread/libpthread.a(pthread_local_storage.c.obj)
+                0x400e3c4c       0x3e pthread/libpthread.a(pthread_local_storage.c.obj)
                                  0x45 (size before relaxing)
-                0x400e3c48                pthread_key_delete
- *fill*         0x400e3c86        0x2 
- .text          0x400e3c88        0xa C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-errno.o)
+                0x400e3c4c                pthread_key_delete
+ *fill*         0x400e3c8a        0x2 
+ .text          0x400e3c8c        0xa C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-errno.o)
                                   0xd (size before relaxing)
-                0x400e3c88                __errno
- *fill*         0x400e3c92        0x2 
- .text          0x400e3c94       0xe8 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-reent.o)
+                0x400e3c8c                __errno
+ *fill*         0x400e3c96        0x2 
+ .text          0x400e3c98       0xe8 C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-reent.o)
                                  0xfc (size before relaxing)
-                0x400e3c94                cleanup_glue
-                0x400e3cac                _reclaim_reent
- .text          0x400e3d7c       0x5e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vprintf.o)
+                0x400e3c98                cleanup_glue
+                0x400e3cb0                _reclaim_reent
+ .text          0x400e3d80       0x5e C:/SysGCC/esp32/esp-idf/v3.2/components/newlib/lib\libc.a(lib_a-vprintf.o)
                                  0x62 (size before relaxing)
-                0x400e3d7c                vprintf
-                0x400e3dac                _vprintf_r
- *fill*         0x400e3dda        0x2 
+                0x400e3d80                vprintf
+                0x400e3db0                _vprintf_r
+ *fill*         0x400e3dde        0x2 
  .text.s_get_num_reserved_regions
-                0x400e3ddc       0x13 soc/libsoc.a(memory_layout_utils.c.obj)
- *fill*         0x400e3def        0x1 
+                0x400e3de0       0x13 soc/libsoc.a(memory_layout_utils.c.obj)
+ *fill*         0x400e3df3        0x1 
  .text.s_prepare_reserved_regions
-                0x400e3df0       0xb2 soc/libsoc.a(memory_layout_utils.c.obj)
+                0x400e3df4       0xb2 soc/libsoc.a(memory_layout_utils.c.obj)
                                  0xba (size before relaxing)
- *fill*         0x400e3ea2        0x2 
+ *fill*         0x400e3ea6        0x2 
  .text.soc_get_available_memory_region_max_count
-                0x400e3ea4       0x12 soc/libsoc.a(memory_layout_utils.c.obj)
-                0x400e3ea4                soc_get_available_memory_region_max_count
- *fill*         0x400e3eb6        0x2 
+                0x400e3ea8       0x12 soc/libsoc.a(memory_layout_utils.c.obj)
+                0x400e3ea8                soc_get_available_memory_region_max_count
+ *fill*         0x400e3eba        0x2 
  .text.soc_get_available_memory_regions
-                0x400e3eb8      0x131 soc/libsoc.a(memory_layout_utils.c.obj)
+                0x400e3ebc      0x131 soc/libsoc.a(memory_layout_utils.c.obj)
                                 0x135 (size before relaxing)
-                0x400e3eb8                soc_get_available_memory_regions
- *fill*         0x400e3fe9        0x3 
+                0x400e3ebc                soc_get_available_memory_regions
+ *fill*         0x400e3fed        0x3 
  .text.esp_ota_get_running_partition
-                0x400e3fec       0x78 app_update/libapp_update.a(esp_ota_ops.c.obj)
+                0x400e3ff0       0x78 app_update/libapp_update.a(esp_ota_ops.c.obj)
                                  0x8c (size before relaxing)
-                0x400e3fec                esp_ota_get_running_partition
+                0x400e3ff0                esp_ota_get_running_partition
  .text.iterator_create
-                0x400e4064       0x21 spi_flash/libspi_flash.a(partition.c.obj)
- *fill*         0x400e4085        0x3 
+                0x400e4068       0x21 spi_flash/libspi_flash.a(partition.c.obj)
+ *fill*         0x400e4089        0x3 
  .text.load_partitions
-                0x400e4088       0xda spi_flash/libspi_flash.a(partition.c.obj)
- *fill*         0x400e4162        0x2 
+                0x400e408c       0xda spi_flash/libspi_flash.a(partition.c.obj)
+ *fill*         0x400e4166        0x2 
  .text.esp_partition_iterator_release
-                0x400e4164        0xe spi_flash/libspi_flash.a(partition.c.obj)
-                0x400e4164                esp_partition_iterator_release
- *fill*         0x400e4172        0x2 
+                0x400e4168        0xe spi_flash/libspi_flash.a(partition.c.obj)
+                0x400e4168                esp_partition_iterator_release
+ *fill*         0x400e4176        0x2 
  .text.esp_partition_next
-                0x400e4174       0x7a spi_flash/libspi_flash.a(partition.c.obj)
+                0x400e4178       0x7a spi_flash/libspi_flash.a(partition.c.obj)
                                  0x82 (size before relaxing)
-                0x400e4174                esp_partition_next
- *fill*         0x400e41ee        0x2 
+                0x400e4178                esp_partition_next
+ *fill*         0x400e41f2        0x2 
  .text.esp_partition_find
-                0x400e41f0       0x42 spi_flash/libspi_flash.a(partition.c.obj)
+                0x400e41f4       0x42 spi_flash/libspi_flash.a(partition.c.obj)
                                  0x4e (size before relaxing)
-                0x400e41f0                esp_partition_find
- *fill*         0x400e4232        0x2 
+                0x400e41f4                esp_partition_find
+ *fill*         0x400e4236        0x2 
  .text.esp_partition_get
-                0x400e4234       0x19 spi_flash/libspi_flash.a(partition.c.obj)
+                0x400e4238       0x19 spi_flash/libspi_flash.a(partition.c.obj)
                                  0x1c (size before relaxing)
-                0x400e4234                esp_partition_get
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x0 
- *fill*         0x400e424d        0x3 
+                0x400e4238                esp_partition_get
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x0 
+ *fill*         0x400e4251        0x3 
  .text.esp_task_wdt_isr_user_handler
-                0x400e4250        0x5 esp32/libesp32.a(task_wdt.c.obj)
-                0x400e4250                esp_task_wdt_isr_user_handler
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x0 
- *fill*         0x400e4255        0x3 
+                0x400e4254        0x5 esp32/libesp32.a(task_wdt.c.obj)
+                0x400e4254                esp_task_wdt_isr_user_handler
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x0 
+ *fill*         0x400e4259        0x3 
  .text.esp_pm_impl_waiti
-                0x400e4258        0x8 esp32/libesp32.a(pm_esp32.c.obj)
-                0x400e4258                esp_pm_impl_waiti
- *fill*         0x400e4260        0x0 
+                0x400e425c        0x8 esp32/libesp32.a(pm_esp32.c.obj)
+                0x400e425c                esp_pm_impl_waiti
+ *fill*         0x400e4264        0x0 
  .text.__cxa_guard_dummy
-                0x400e4260        0x5 cxx/libcxx.a(cxx_guards.cpp.obj)
-                0x400e4260                __cxa_guard_dummy
- *fill*         0x400e4265        0x0 
- *fill*         0x400e4265        0x3 
+                0x400e4264        0x5 cxx/libcxx.a(cxx_guards.cpp.obj)
+                0x400e4264                __cxa_guard_dummy
+ *fill*         0x400e4269        0x0 
+ *fill*         0x400e4269        0x3 
  .text.TLS3001_fill_packet_cmd
-                0x400e4268       0xc7 main/libmain.a(blink.c.obj)
-                0x400e4268                TLS3001_fill_packet_cmd
- *fill*         0x400e432f        0x0 
- *fill*         0x400e432f        0x1 
+                0x400e426c       0xc7 main/libmain.a(blink.c.obj)
+                0x400e426c                TLS3001_fill_packet_cmd
+ *fill*         0x400e4333        0x0 
+ *fill*         0x400e4333        0x1 
  .text.prep_pixel_packet
-                0x400e4330       0x29 main/libmain.a(blink.c.obj)
-                0x400e4330                prep_pixel_packet
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x0 
- *fill*         0x400e4359        0x3 
+                0x400e4334       0x29 main/libmain.a(blink.c.obj)
+                0x400e4334                prep_pixel_packet
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x0 
+ *fill*         0x400e435d        0x3 
  .text.heap_caps_match
-                0x400e435c       0x34 heap/libheap.a(heap_caps.c.obj)
-                0x400e435c                heap_caps_match
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
- *fill*         0x400e4390        0x0 
+                0x400e4360       0x34 heap/libheap.a(heap_caps.c.obj)
+                0x400e4360                heap_caps_match
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
+ *fill*         0x400e4394        0x0 
  .text._system_r
-                0x400e4390        0xb newlib/libnewlib.a(syscalls.c.obj)
-                0x400e4390                _system_r
- *fill*         0x400e439b        0x0 
- *fill*         0x400e439b        0x0 
- *fill*         0x400e439b        0x1 
+                0x400e4394        0xb newlib/libnewlib.a(syscalls.c.obj)
+                0x400e4394                _system_r
+ *fill*         0x400e439f        0x0 
+ *fill*         0x400e439f        0x0 
+ *fill*         0x400e439f        0x1 
  .text._getpid_r
-                0x400e439c        0xb newlib/libnewlib.a(syscalls.c.obj)
-                0x400e439c                _getpid_r
- *fill*         0x400e43a7        0x1 
- .text._kill_r  0x400e43a8        0xb newlib/libnewlib.a(syscalls.c.obj)
-                0x400e43a8                _kill_r
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x0 
- *fill*         0x400e43b3        0x1 
+                0x400e43a0        0xb newlib/libnewlib.a(syscalls.c.obj)
+                0x400e43a0                _getpid_r
+ *fill*         0x400e43ab        0x1 
+ .text._kill_r  0x400e43ac        0xb newlib/libnewlib.a(syscalls.c.obj)
+                0x400e43ac                _kill_r
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x0 
+ *fill*         0x400e43b7        0x1 
  .text.is_wifi_clk_peripheral
-                0x400e43b4       0x1c driver/libdriver.a(periph_ctrl.c.obj)
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
- *fill*         0x400e43d0        0x0 
+                0x400e43b8       0x1c driver/libdriver.a(periph_ctrl.c.obj)
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
+ *fill*         0x400e43d4        0x0 
  .text.spi_freq_for_pre_n
-                0x400e43d0        0xb driver/libdriver.a(spi_master.c.obj)
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x0 
- *fill*         0x400e43db        0x1 
+                0x400e43d4        0xb driver/libdriver.a(spi_master.c.obj)
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x0 
+ *fill*         0x400e43df        0x1 
  .text.s_compare_reserved_regions
-                0x400e43dc        0xc soc/libsoc.a(memory_layout_utils.c.obj)
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
- *fill*         0x400e43e8        0x0 
+                0x400e43e0        0xc soc/libsoc.a(memory_layout_utils.c.obj)
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
+ *fill*         0x400e43ec        0x0 
  *(.irom0.text)
  *(.fini.literal)
  *(.fini)
  *(.gnu.version)
-                0x400e43e8                _text_end = ABSOLUTE (.)
-                0x400e43e8                _etext = .
+                0x400e43ec                _text_end = ABSOLUTE (.)
+                0x400e43ec                _etext = .
                 0x00000000                _flash_cache_start = 0x0
                 [!provide]                PROVIDE (Add2SelfBigHex256, 0x40015b7c)
                 [!provide]                PROVIDE (AddBigHex256, 0x40015b28)

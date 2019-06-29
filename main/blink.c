@@ -66,7 +66,7 @@ void blink_task(void *pvParameter)
 	TLS3001_fill_packet_cmd(spi_tx_data, RESET_CMD, (RESET_CMD_LEN_BITS_SPI / 2));
 	TLS3001_send_packet(spi_tx_data, RESET_CMD_LEN_BITS_SPI);
 	
-	vTaskDelay(1 / portTICK_PERIOD_MS);
+	vTaskDelay(2 / portTICK_PERIOD_MS);
 	
 	TLS3001_fill_packet_cmd(spi_tx_data, SYNCH_CMD, (SYNCH_CMD_LEN_BITS_SPI / 2));
 	TLS3001_send_packet(spi_tx_data, SYNCH_CMD_LEN_BITS_SPI);
@@ -77,7 +77,7 @@ void blink_task(void *pvParameter)
 	spi_tx_data_last = TLS3001_pack_packet_color(spi_tx_data, START_CMD, (START_CMD_LEN_BITS_SPI / 2), false);
 	spi_tx_data_last = TLS3001_pack_packet_color(spi_tx_data_last, pixel_test, (RGB_PACKET_LEN_SPI / 2), true);
 
-	TLS3001_send_packet(spi_tx_data, RGB_PACKET_LEN_SPI);
+	TLS3001_send_packet(spi_tx_data, (RGB_PACKET_LEN_SPI + START_CMD_LEN_BITS_SPI));
 	
 	
     gpio_pad_select_gpio(BLINK_GPIO);
