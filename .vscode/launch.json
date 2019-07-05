@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "type": "gdb",
+      "request": "launch",
+      "name": "Flash and Debug Jlink",
+      "target": "./build/pmstep-driver.elf",
+      "cwd": "${workspaceFolder}",
+      "gdbpath": "xtensa-esp32-elf-gdb",
+      "autorun": [
+        "target remote :3333",
+        "mon reset halt",
+        "mon program_esp32 ./build/pmstep-driver.bin 0x10000 verify",
+        "mon reset halt",
+        "flushregs",
+        "thb app_main",
+        "c"
+      ],
+      "preLaunchTask": "openocd"
+    }
+  ]
+}

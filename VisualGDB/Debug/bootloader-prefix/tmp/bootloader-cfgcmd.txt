@@ -1,1 +1,0 @@
-cmd='C:/Users/pluspole/AppData/Local/VisualGDB/CMake/bin/cmake.exe;-DSDKCONFIG=C:/Users/pluspole/Documents/esp32_projects/esp32_TLS3001_spi/esp32_TLS3001_spi/sdkconfig;-DIDF_PATH=C:/SysGCC/esp32/esp-idf/v3.2;-GNinja;<SOURCE_DIR><SOURCE_SUBDIR>'
