@@ -20,7 +20,7 @@
 #include "sdkconfig.h"
 #include "main.h"
 #include "TLS3001.h"
-#include "timer.h"
+#include "rom/ets_sys.h"
 
 #define PIN_NUM_MOSI 5
 #define PIN_NUM_CLK  18
@@ -31,7 +31,6 @@ void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len);
 void deinit_spi_data_buffer(void *spi_manchester_data_p);
 void post_cb_func(spi_transaction_t* trans);
 
-
 spi_device_handle_t spi;
 
 uint64_t reset_cmd;
@@ -39,22 +38,24 @@ uint64_t synch_cmd;
 uint64_t start_cmd;
 void *spi_tx_data_start;
 
-uint64_t pixel_test = 0;
 uint16_t pixel1_red = 4000;
 uint16_t pixel1_green = 4;
 uint16_t pixel1_blue = 16;
 
-uint16_t color_array[3];
+#define num_pixels 50
+uint16_t color_array[(num_pixels*3)];
 
 void blink_task(void *pvParameter)
 {
-	bool blink = false;
 	uint8_t *spi_tx_data_last;
-	
-	color_array[0] = pixel1_red;
-	color_array[1] = pixel1_green;
-	color_array[2] = pixel1_blue;
-	uint16_t num_pixels = 1;
+
+
+	for (size_t i = 0; i < num_pixels; i++)
+	{
+		color_array[(i*3)+0] = pixel1_red;
+		color_array[(i*3)+1] = pixel1_green;
+		color_array[(i*3)+2] = pixel1_blue;
+	}
 
 	gpio_pad_select_gpio(BLINK_GPIO);
     /* Set the GPIO as a push/pull output */
@@ -65,37 +66,40 @@ void blink_task(void *pvParameter)
 	// Prepare the reset and synch commands
 	pack_manchester_data_segment(&reset_cmd, RESET_CMD, RESET_CMD_LEN_MANCH, true);	
 	pack_manchester_data_segment(&synch_cmd, SYNCH_CMD, SYNCH_CMD_LEN_MANCH, true);
+	pack_manchester_data_segment(&start_cmd, START_CMD, START_CMD_LEN_MANCH, true);
 
 	//prepare the color data
 	TLE3001_prep_color_packet(spi_tx_data_start, &color_array, num_pixels);
 
+	spi_device_acquire_bus(spi, portMAX_DELAY);
 
-	//Start with taking the semiphore
-	if(xSemaphoreTake(xSemaphore_delay, ( TickType_t ) 10) != pdTRUE)
-    {
-		//Something went wrong
-    }
-	user_timer_set_delay(1000);
+	TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI);			//Send RESET
+	ets_delay_us(1000); 										//Delays 1ms
+	TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI);			//Send SYNCH
+	spi_device_release_bus(spi);
 
-	TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI);
-	user_timer_start();	//Maybe start timer in post_cb_func??
-
-	while(xSemaphoreTake( xSemaphore_delay, 0 ) != pdTRUE){
-	}
+	ets_delay_us(10000); 	//min delay of 28.34us times the number of pixels
 	
-	//vTaskDelay(2 / portTICK_PERIOD_MS);					//Need better delay here..
-	TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI);
-
-	vTaskDelay(10 / portTICK_PERIOD_MS);				//Need better delay here..
-
-	TLS3001_send_packet(spi_tx_data_start, (PIXEL_DATA_LEN_SPI+START_CMD_LEN_SPI));
-	
+	//Send colors
+	spi_device_acquire_bus(spi, portMAX_DELAY);
+	TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI));
+	ets_delay_us(150); 
+	TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI);
+	spi_device_release_bus(spi);
 	
 
     while(1) {
         /* Blink off (output low) */
         //gpio_set_level(BLINK_GPIO, 0);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+		//Send colors
+		spi_device_acquire_bus(spi, portMAX_DELAY);
+		TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI));
+		ets_delay_us(150); 
+		TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI);
+		spi_device_release_bus(spi);
+
         /* Blink on (output high) */
         //gpio_set_level(BLINK_GPIO, 1);
        
@@ -114,12 +118,6 @@ void blink_task(void *pvParameter)
 			}
            // It is time to execute.
 
-           // ...
-
-           // We have finished our task.  Return to the top of the loop where
-           // we will block on the semaphore until it is time to execute
-           // again.  Note when using the semaphore for synchronisation with an
-           // ISR in this manner there is no need to 'give' the semaphore back.
        }
 	    */
 	    //TLS3001_send_packet(spi_tx_data, RESET_CMD_LEN_BITS_SPI);
@@ -135,8 +133,6 @@ void app_main()
 		}
 	}
 	
-	init_timer();
-
 	init_spi_data_buffer(&spi_tx_data_start, 1500);	//1500 bytes for 100 pixels should be enough.
 	
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
@@ -144,7 +140,7 @@ void app_main()
 
 void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len)
 {
-	*spi_manchester_data_p = heap_caps_malloc(byte_len, MALLOC_CAP_8BIT);
+	*spi_manchester_data_p = heap_caps_malloc(byte_len, (MALLOC_CAP_DMA | MALLOC_CAP_32BIT));
 }
 
 void deinit_spi_data_buffer(void *spi_manchester_data_p)
@@ -182,9 +178,9 @@ esp_err_t SPI_init(void)
 		.cs_ena_pretrans = 0, 
 				//CS setup time in us
 		.flags = (SPI_DEVICE_HALFDUPLEX) | (SPI_DEVICE_3WIRE),
-		.input_delay_ns = 0		
+		.input_delay_ns = 0	
 		//.pre_cb = pre_cb_func,		//pre interrupt for manually toggle CS
-	    //.post_cb = post_cb_func,		//post interrupt for manually toggle CS
+	    //.post_cb = post_cb_func			//post interrupt for manually toggle CS
 	};
 		
 	
@@ -195,7 +191,7 @@ esp_err_t SPI_init(void)
 	//spi_rxdata_p = heap_caps_malloc(64, MALLOC_CAP_DEFAULT);         	//For no DMA
 
 	//Initialize the SPI bus
-	ret = spi_bus_initialize(HSPI_HOST, &buscfg, 0);
+	ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
 	if (ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "spi_bus_initialize(): returned %d", ret);
@@ -209,13 +205,6 @@ esp_err_t SPI_init(void)
 		ESP_LOGE(__func__, "spi_bus_add_device(): returned %d", ret);
 	}
 	assert(ret == ESP_OK);
-
-	/*
-	spi_max_freq = spi_get_freq_limit(true, devcfg.input_delay_ns);
-	ESP_LOGI(__func__, "SPI max freq: %d", spi_max_freq);
-	*/
-	
-	spi_device_acquire_bus(spi, portMAX_DELAY);
 	
 	return ESP_OK;
 }
@@ -223,6 +212,6 @@ esp_err_t SPI_init(void)
 void post_cb_func(spi_transaction_t* trans) {
 		//Callback when a queued SPI transmit has completed
 	
-	
+	//user_timer_delay_start();	//Maybe start timer in post_cb_func??
 
 }

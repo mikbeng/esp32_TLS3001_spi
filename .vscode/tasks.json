@@ -81,6 +81,24 @@
       },
       "problemMatcher": []
     },
+    
+    {
+      "label": "monitor",
+      "type":"shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "windows": {
+        "command": "python ${env:IDF_PATH}/tools/idf.py monitor -p COM70",  
+      },
+      "linux": {
+        "command": "idf.py -p ${input:COMPORT_LINUX} monitor",
+      },
+      "presentation": {
+          "reveal": "always",
+      },
+      "problemMatcher": []
+    },
 
     {
       "label": "flash app USB",

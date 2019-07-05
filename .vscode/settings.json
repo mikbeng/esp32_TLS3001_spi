@@ -4,6 +4,7 @@
         "stdio.h": "c",
         "timer_interrupt_comp.h": "c",
         "timer.h": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "semphr.h": "c"
     }
 }

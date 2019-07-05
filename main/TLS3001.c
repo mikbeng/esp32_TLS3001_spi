@@ -22,13 +22,23 @@ void TLE3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data,
 
 	spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, START_CMD, START_CMD_LEN_MANCH, false);
 
-    //For loop for filling 1 pixel of data at a time.
-    for (size_t i = 0; i < num_pixels; i++)
-    {
-        spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+ (i*3)+0 ), COLOR_DATA_LEN_MANCH, false);
-	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+ (i*3)+1 ), COLOR_DATA_LEN_MANCH, false);
-	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+ (i*3)+2 ), COLOR_DATA_LEN_MANCH, true);
-    }
+	if (num_pixels == 1)
+	{
+		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+0 ), COLOR_DATA_LEN_MANCH, false);
+	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+1 ), COLOR_DATA_LEN_MANCH, false);
+	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+2 ), COLOR_DATA_LEN_MANCH, true);
+	}
+	else
+	{
+		//For loop for filling 1 color of data at a time.
+		for (size_t i = 0; i < ((num_pixels*3)-1); i++)
+		{
+			spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+i), COLOR_DATA_LEN_MANCH, false);
+		}
+
+		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+((num_pixels*3)-1) ), COLOR_DATA_LEN_MANCH, true);
+
+	}
     
 
 } 
