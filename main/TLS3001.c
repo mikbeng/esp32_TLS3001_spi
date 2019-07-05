@@ -106,3 +106,35 @@ esp_err_t TLS3001_send_packet(void *data, uint32_t length)
 	
 	return ESP_OK;
 }
+
+esp_err_t TLS3001_send_color_packet(void *spi_tx_data_start, uint16_t num_pixels)
+{
+	esp_err_t ret;
+	ret = spi_device_acquire_bus(spi, portMAX_DELAY);
+	if(ret != ESP_OK)
+	{
+		ESP_LOGE(__func__, "spi_device_acquire_bus(): returned %d", ret);
+		return ret;
+	}
+
+	ret = TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI));
+	if(ret != ESP_OK)
+	{
+		ESP_LOGE(__func__, "TLS3001_send_packet(): returned %d", ret);
+		return ret;
+	}
+
+	ets_delay_us(150); 
+
+	ret = TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI);
+	if(ret != ESP_OK)
+	{
+		ESP_LOGE(__func__, "TLS3001_send_packet(): returned %d", ret);
+		return ret;
+	}
+
+	spi_device_release_bus(spi);	
+
+	return ESP_OK;
+
+}

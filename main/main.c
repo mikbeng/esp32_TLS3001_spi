@@ -21,10 +21,10 @@
 #include "main.h"
 #include "TLS3001.h"
 #include "rom/ets_sys.h"
+#include "pattern_generator.h"
 
 #define PIN_NUM_MOSI 5
 #define PIN_NUM_CLK  18
-
 
 esp_err_t SPI_init(void);
 void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len);
@@ -36,40 +36,17 @@ spi_device_handle_t spi;
 uint64_t reset_cmd;
 uint64_t synch_cmd;
 uint64_t start_cmd;
+
 void *spi_tx_data_start;
-
-uint16_t pixel1_red = 4000;
-uint16_t pixel1_green = 4;
-uint16_t pixel1_blue = 16;
-
-#define num_pixels 50
-uint16_t color_array[(num_pixels*3)];
 
 void blink_task(void *pvParameter)
 {
 	uint8_t *spi_tx_data_last;
 
-
-	for (size_t i = 0; i < num_pixels; i++)
-	{
-		color_array[(i*3)+0] = pixel1_red;
-		color_array[(i*3)+1] = pixel1_green;
-		color_array[(i*3)+2] = pixel1_blue;
-	}
-
-	gpio_pad_select_gpio(BLINK_GPIO);
-    /* Set the GPIO as a push/pull output */
-    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-
-	gpio_set_level(BLINK_GPIO, 0);
-
 	// Prepare the reset and synch commands
 	pack_manchester_data_segment(&reset_cmd, RESET_CMD, RESET_CMD_LEN_MANCH, true);	
 	pack_manchester_data_segment(&synch_cmd, SYNCH_CMD, SYNCH_CMD_LEN_MANCH, true);
 	pack_manchester_data_segment(&start_cmd, START_CMD, START_CMD_LEN_MANCH, true);
-
-	//prepare the color data
-	TLE3001_prep_color_packet(spi_tx_data_start, &color_array, num_pixels);
 
 	spi_device_acquire_bus(spi, portMAX_DELAY);
 
@@ -78,49 +55,25 @@ void blink_task(void *pvParameter)
 	TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI);			//Send SYNCH
 	spi_device_release_bus(spi);
 
-	ets_delay_us(10000); 	//min delay of 28.34us times the number of pixels
+	ets_delay_us(SYNCH_DELAY); 	//min delay of 28.34us times the number of pixels
 	
+	uint16_t test_color[3] = {3000, 0, 1000};
+	uint16_t test_pixels = 50;
+	pattern_equal_color(spi_tx_data_start, &test_color, test_pixels);
+
 	//Send colors
-	spi_device_acquire_bus(spi, portMAX_DELAY);
-	TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI));
-	ets_delay_us(150); 
-	TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI);
-	spi_device_release_bus(spi);
-	
+	TLS3001_send_color_packet(spi_tx_data_start, test_pixels);
 
     while(1) {
-        /* Blink off (output low) */
-        //gpio_set_level(BLINK_GPIO, 0);
+
         vTaskDelay(100 / portTICK_PERIOD_MS);
 
+		//gpio_set_level(BLINK_GPIO, 0);
+
 		//Send colors
-		spi_device_acquire_bus(spi, portMAX_DELAY);
-		TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI));
-		ets_delay_us(150); 
-		TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI);
-		spi_device_release_bus(spi);
+	TLS3001_send_color_packet(spi_tx_data_start, test_pixels);
 
-        /* Blink on (output high) */
-        //gpio_set_level(BLINK_GPIO, 1);
-       
-	/*
-	if( xSemaphoreTake( xSemaphore_delay, 0xffff ) == pdTRUE )
-       {
-		    if(blink == false)
-			{
-				gpio_set_level(BLINK_GPIO, 1);
-				blink = true;
-			}
-			else
-			{
-				gpio_set_level(BLINK_GPIO, 0);
-				blink = false;
-			}
-           // It is time to execute.
 
-       }
-	    */
-	    //TLS3001_send_packet(spi_tx_data, RESET_CMD_LEN_BITS_SPI);
     }
 }
 
@@ -133,6 +86,11 @@ void app_main()
 		}
 	}
 	
+
+	gpio_pad_select_gpio(BLINK_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+
 	init_spi_data_buffer(&spi_tx_data_start, 1500);	//1500 bytes for 100 pixels should be enough.
 	
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
