@@ -12,7 +12,8 @@ static void timer_isr(void* arg)
     
     static BaseType_t xHigherPriorityTaskWoken;
 
-    //timer_pause(TIMER_GROUP_0, TIMER_0);
+    timer_pause(TIMER_GROUP_0, TIMER_0);
+    timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
 
     TIMERG0.int_clr_timers.t0 = 1;
     TIMERG0.hw_timer[0].config.alarm_en = 1;
@@ -31,7 +32,7 @@ void init_timer()
             .counter_en = false,
             .intr_type = TIMER_INTR_LEVEL,
             .counter_dir = TIMER_COUNT_UP,
-            .auto_reload = true,
+            .auto_reload = false,
             .divider = 80   // 1 us per tick 
     };
     
@@ -40,22 +41,17 @@ void init_timer()
     timer_enable_intr(TIMER_GROUP_0, TIMER_0);
     timer_isr_register(TIMER_GROUP_0, TIMER_0, &timer_isr, NULL, 0, &s_timer_handle);
 
-    vSemaphoreCreateBinary( xSemaphore_delay );
+    vSemaphoreCreateBinary(xSemaphore_delay);
 }
 
-esp_err_t user_timer_start(int timer_period_us)
+esp_err_t user_timer_start()
 {
-    if(xSemaphoreTake(xSemaphore_delay, ( TickType_t ) 10) == pdTRUE)
-    {
-        timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, timer_period_us);
-        timer_start(TIMER_GROUP_0, TIMER_0);
-        return ESP_OK;
-    }
-    else
-    {
-        return ESP_FAIL;
-    }
-    
+    timer_start(TIMER_GROUP_0, TIMER_0);
+    return ESP_OK;
+}
 
-
+esp_err_t user_timer_set_delay(int timer_period_us)
+{
+    timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, timer_period_us);
+    return ESP_OK;
 }

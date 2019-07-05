@@ -56,6 +56,10 @@ void blink_task(void *pvParameter)
 	color_array[2] = pixel1_blue;
 	uint16_t num_pixels = 1;
 
+	gpio_pad_select_gpio(BLINK_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+
 	gpio_set_level(BLINK_GPIO, 0);
 
 	// Prepare the reset and synch commands
@@ -65,10 +69,17 @@ void blink_task(void *pvParameter)
 	//prepare the color data
 	TLE3001_prep_color_packet(spi_tx_data_start, &color_array, num_pixels);
 
+
+	//Start with taking the semiphore
+	if(xSemaphoreTake(xSemaphore_delay, ( TickType_t ) 10) != pdTRUE)
+    {
+		//Something went wrong
+    }
+	user_timer_set_delay(1000);
+
 	TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI);
-	
-	//Delay
-	user_timer_start(1000);
+	user_timer_start();	//Maybe start timer in post_cb_func??
+
 	while(xSemaphoreTake( xSemaphore_delay, 0 ) != pdTRUE){
 	}
 	
@@ -80,9 +91,7 @@ void blink_task(void *pvParameter)
 	TLS3001_send_packet(spi_tx_data_start, (PIXEL_DATA_LEN_SPI+START_CMD_LEN_SPI));
 	
 	
-    gpio_pad_select_gpio(BLINK_GPIO);
-    /* Set the GPIO as a push/pull output */
-    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+
     while(1) {
         /* Blink off (output low) */
         //gpio_set_level(BLINK_GPIO, 0);
