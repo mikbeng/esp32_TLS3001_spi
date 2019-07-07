@@ -2,6 +2,8 @@
 
 #include "esp_err.h"
 #include "stdbool.h"
+#include "driver/spi_master.h"
+#include "freertos/task.h"
 
 #define num_pixels_max 50
 
@@ -30,9 +32,24 @@
 
 #define RGB_PACKET_LEN_SPI (39*2)
 
-#define SYNCH_DELAY (28.34*num_pixels_max)
+#define SYNCH_DELAY_PER_PIXEL (28.34)
 
-void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_t data_in, uint32_t bit_length_manch, bool last_segment_flag);
-void TLE3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data, uint16_t num_pixels);
-esp_err_t TLS3001_send_packet(void *data, uint32_t length);
-esp_err_t TLS3001_send_color_packet(void *spi_tx_data_start, uint16_t num_pixels);
+#define LOOP_CORE 1
+
+typedef struct
+{
+    uint16_t num_pixels;
+    spi_host_device_t spi_channel;
+    uint16_t spi_freq;
+	
+}TLS3001_config_s;
+
+typedef struct
+{
+    TLS3001_config_s config;
+    spi_device_handle_t *spi_handle;
+    QueueHandle_t  data_in_queue;	
+    TaskHandle_t *TLS3001_task_handle;
+}TLS3001_handle_s;
+
+esp_err_t TLS3001_init(TLS3001_handle_s *TLS3001_handle);

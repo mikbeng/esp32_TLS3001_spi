@@ -26,87 +26,49 @@
 #define PIN_NUM_MOSI 5
 #define PIN_NUM_CLK  18
 
-esp_err_t SPI_init(void);
-void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len);
-void deinit_spi_data_buffer(void *spi_manchester_data_p);
+esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle);
 void post_cb_func(spi_transaction_t* trans);
-
-spi_device_handle_t spi;
-
-uint64_t reset_cmd;
-uint64_t synch_cmd;
-uint64_t start_cmd;
-
-void *spi_tx_data_start;
-
-void blink_task(void *pvParameter)
-{
-	uint8_t *spi_tx_data_last;
-
-	// Prepare the reset and synch commands
-	pack_manchester_data_segment(&reset_cmd, RESET_CMD, RESET_CMD_LEN_MANCH, true);	
-	pack_manchester_data_segment(&synch_cmd, SYNCH_CMD, SYNCH_CMD_LEN_MANCH, true);
-	pack_manchester_data_segment(&start_cmd, START_CMD, START_CMD_LEN_MANCH, true);
-
-	spi_device_acquire_bus(spi, portMAX_DELAY);
-
-	TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI);			//Send RESET
-	ets_delay_us(1000); 										//Delays 1ms
-	TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI);			//Send SYNCH
-	spi_device_release_bus(spi);
-
-	ets_delay_us(SYNCH_DELAY); 	//min delay of 28.34us times the number of pixels
-	
-	uint16_t test_color[3] = {3000, 0, 1000};
-	uint16_t test_pixels = 50;
-	pattern_equal_color(spi_tx_data_start, &test_color, test_pixels);
-
-	//Send colors
-	TLS3001_send_color_packet(spi_tx_data_start, test_pixels);
-
-    while(1) {
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-
-		//gpio_set_level(BLINK_GPIO, 0);
-
-		//Send colors
-	TLS3001_send_color_packet(spi_tx_data_start, test_pixels);
-
-
-    }
-}
 
 void app_main()
 {
-	if (SPI_init() != ESP_OK) {
-		printf("Error initializing spi\n");
-		while (1) {
-			vTaskDelay(1000 / portTICK_PERIOD_MS);
-		}
-	}
-	
 
 	gpio_pad_select_gpio(BLINK_GPIO);
     /* Set the GPIO as a push/pull output */
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-	init_spi_data_buffer(&spi_tx_data_start, 1500);	//1500 bytes for 100 pixels should be enough.
-	
-    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+
+	spi_device_handle_t HSPI;
+	QueueHandle_t  q1=NULL;
+
+	q1=xQueueCreate(20,sizeof(unsigned long));
+    if(q1 == NULL){
+		ESP_LOGE(__func__, "xQueueCreate() failed");
+    }
+
+	TLS3001_handle_s TLS3001_handle_ch1 = {
+		{
+			.num_pixels = 50,
+			.spi_channel = HSPI_HOST,
+			.spi_freq = 500000,
+		},
+		.spi_handle = &HSPI,
+		.data_in_queue = q1,
+		.TLS3001_task_handle = NULL
+	};
+
+	if (SPI_init(&TLS3001_handle_ch1) != ESP_OK) {
+		printf("Error initializing spi\n");
+		while (1) {
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		}
+	}
+
+	TLS3001_init(&TLS3001_handle_ch1);
+
 }
 
-void init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len)
-{
-	*spi_manchester_data_p = heap_caps_malloc(byte_len, (MALLOC_CAP_DMA | MALLOC_CAP_32BIT));
-}
 
-void deinit_spi_data_buffer(void *spi_manchester_data_p)
-{
-	heap_caps_free(spi_manchester_data_p);
-}
-
-esp_err_t SPI_init(void)
+esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle)
 {
 	esp_err_t ret;
 	
@@ -123,7 +85,7 @@ esp_err_t SPI_init(void)
 		.command_bits = 0,
 		.address_bits = 0,
 		.dummy_bits = 0,
-		.clock_speed_hz = (500000), 
+		.clock_speed_hz = TLS3001_handle->config.spi_freq, 
 		 	//Clock out at 6 MHz				
 		.mode = 1, 
 							//SPI mode 1		                               
@@ -141,15 +103,8 @@ esp_err_t SPI_init(void)
 	    //.post_cb = post_cb_func			//post interrupt for manually toggle CS
 	};
 		
-	
-	/*For DMA*/
-	//dma_motion_data_p = heap_caps_malloc(64,
-	//	(MALLOC_CAP_DMA | MALLOC_CAP_32BIT));
-	
-	//spi_rxdata_p = heap_caps_malloc(64, MALLOC_CAP_DEFAULT);         	//For no DMA
-
-	//Initialize the SPI bus
-	ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
+	//Initialize the SPI bus with DMA channel 1
+	ret = spi_bus_initialize(TLS3001_handle->config.spi_channel, &buscfg, 1);
 	if (ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "spi_bus_initialize(): returned %d", ret);
@@ -157,7 +112,7 @@ esp_err_t SPI_init(void)
 	assert(ret == ESP_OK);
 	
 	//Attach the device to the SPI bus
-	ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi);
+	ret = spi_bus_add_device(HSPI_HOST, &devcfg, TLS3001_handle->spi_handle);
 	if (ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "spi_bus_add_device(): returned %d", ret);
