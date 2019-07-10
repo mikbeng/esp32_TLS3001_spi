@@ -4,8 +4,10 @@
 #include "stdbool.h"
 #include "driver/spi_master.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
-#define num_pixels_max 50
+#define CH1_PIN_NUM_MOSI 5
+#define CH1_PIN_NUM_CLK  18
 
 #define MANCHESTER_ONE 0x02		//0b10
 #define MANCHESTER_ZERO 0x01	//0b01
@@ -38,18 +40,24 @@
 
 typedef struct
 {
+    void *spi_tx_data_start;
     uint16_t num_pixels;
     spi_host_device_t spi_channel;
-    uint16_t spi_freq;
-	
-}TLS3001_config_s;
-
-typedef struct
-{
-    TLS3001_config_s config;
-    spi_device_handle_t *spi_handle;
-    QueueHandle_t  data_in_queue;	
-    TaskHandle_t *TLS3001_task_handle;
+    spi_device_handle_t spi_handle;
+    uint32_t spi_freq;
+    int spi_mosi_pin;
+    int spi_clk_pin;
 }TLS3001_handle_s;
 
-esp_err_t TLS3001_init(TLS3001_handle_s *TLS3001_handle);
+typedef struct 
+{
+bool message_ready;
+void *message;
+uint16_t len;
+SemaphoreHandle_t pixel_data_semaphore;
+}pixel_message_s;
+
+extern TaskHandle_t TLS3001_send_task;
+
+esp_err_t TLS3001_ch1_init(uint16_t num_pixels);
+

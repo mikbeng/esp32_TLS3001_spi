@@ -1,5 +1,8 @@
 #pragma once
 
 #include "stdint.h"
+#include "main.h"
 
-esp_err_t pattern_init(TLS3001_handle_s *TLS3001_handle_1, TLS3001_handle_s *TLS3001_handle_2);
+esp_err_t pattern_init(uint16_t num_pixels);
+
+extern SemaphoreHandle_t patten_data_semaphore;

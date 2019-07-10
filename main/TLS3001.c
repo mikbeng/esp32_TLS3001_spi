@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 #include "driver/gpio.h"
 #include "stdint.h"
 #include "stdbool.h"
@@ -14,80 +15,201 @@
 #include "main.h"
 #include "math.h"
 
-
-void *spi_tx_data_start;
-
+static esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle);
 static esp_err_t init_spi_data_buffer(void **spi_manchester_data_p, uint32_t byte_len);
 static void deinit_spi_data_buffer(void *spi_manchester_data_p);
 static void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_t data_in, uint32_t bit_length_manch, bool last_segment_flag);
-static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data, TLS3001_handle_s *self);
-static esp_err_t TLS3001_send_packet(void *data, uint32_t length, TLS3001_handle_s *self);
-static esp_err_t TLS3001_send_color_packet(void *spi_tx_data_start, TLS3001_handle_s *self);
-static esp_err_t TLS3001_send_resetsynch_packet(void *spi_tx_data_start, TLS3001_handle_s *self);
+static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data, uint16_t num_pixels);
+static esp_err_t TLS3001_send_packet(uint8_t *data, uint32_t length, spi_device_handle_t spi_handle);
+static esp_err_t TLS3001_send_color_packet(uint8_t *spi_tx_data_start, uint16_t num_pixels, spi_device_handle_t spi_handle);
+static esp_err_t TLS3001_send_resetsynch_packet(spi_device_handle_t spi_handle);
+static void TLS3001_task(void *arg);
+
 
 static const char * TAG = "TLS3001";
 
-uint64_t reset_cmd;
-uint64_t synch_cmd;
-uint64_t start_cmd;
+
+static uint64_t reset_cmd;
+static uint64_t synch_cmd;
+static uint64_t start_cmd;
+static TLS3001_handle_s TLS3001_handle_ch1;
+static TLS3001_handle_s TLS3001_handle_ch2;
+static spi_device_handle_t spi_ch1;
+static spi_device_handle_t spi_ch2;
+static void * spi_ch1_tx_data_start;
+static void * spi_ch2_tx_data_start;
+
+TaskHandle_t TLS3001_send_task;
+
+uint16_t input_color_array[TEST_PIXELS];
+
+pixel_message_s pixel_message_incomming;
 
 static void TLS3001_task(void *arg)
 {
-	TLS3001_handle_s *self = arg;
-	uint16_t input_color_array[(self->config.num_pixels)*3];
+	uint16_t *p_message;
+
+	pixel_message_s *pixel_message_incomming_p;
+	pixel_message_incomming_p = &pixel_message_incomming;
+	
+	//uint16_t input_color_array[(TLS3001_handle_ch1.num_pixels)*3];
+
+	bool got_color = false;
 
 	// Prepare the reset and synch commands
 	pack_manchester_data_segment(&reset_cmd, RESET_CMD, RESET_CMD_LEN_MANCH, true);	
 	pack_manchester_data_segment(&synch_cmd, SYNCH_CMD, SYNCH_CMD_LEN_MANCH, true);
 	pack_manchester_data_segment(&start_cmd, START_CMD, START_CMD_LEN_MANCH, true);
 
-	TLS3001_send_resetsynch_packet(spi_tx_data_start, self);
-	
-	uint16_t test_color[3] = {3000, 0, 1000};
-	uint16_t test_pixels = 50;
-	//pattern_equal_color(spi_tx_data_start, &test_color, self_config->num_pixels);
+	TLS3001_send_resetsynch_packet(TLS3001_handle_ch1.spi_handle);
+	ets_delay_us(SYNCH_DELAY_PER_PIXEL * TLS3001_handle_ch1.num_pixels); 	//min delay of 28.34us times the number of pixels
 
-	//Send colors
-	TLS3001_send_color_packet(spi_tx_data_start, self);
+	uint32_t data_in_address = 0;
 
     while(1) {
 
-		//Check incomming data queue
-		xQueueReceive(self->data_in_queue, &input_color_array, 0);
+		/*
+		if(xTaskNotifyWait( 0x00,      // Don't clear any notification bits on entry. 
+                         ULONG_MAX, // Reset the notification value to 0 on exit. 
+                         &data_in_address, // Notified value pass out in ulNotifiedValue.                                        
+                         portMAX_DELAY ))  // Block indefinitely. 
+		{
+			//Notification was recieved
+			//Notification value is now saved in data_in_address variable. The notification value itself is set to zero upon exit of xTaskNotifyWait.
 
-		TLS3001_prep_color_packet(spi_tx_data_start, &input_color_array, self);
+			//try to take semipore
+			if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+			{
+				// We were able to obtain the semaphore and can now access the
+				// shared resource.
 
-		//Send colors
-		TLS3001_send_color_packet(spi_tx_data_start, self);
+				// ...
+
+				// We have finished accessing the shared resource.  Release the
+				// semaphore.
+				xSemaphoreGive( xSemaphore );
+       		}
+		}*/
+
+		//Check incomming data queue. Could be from pattern task or cmd task!
+		
+		if(xQueueReceive(TLS3001_input_queue, &pixel_message_incomming, 10) == pdTRUE)
+		{
+			got_color = true;
+			ESP_LOGI(TAG, "Recieved pixel data on queue:\n Message ready: %u\n pointer: %u\n len: %u", 
+				pixel_message_incomming_p->message_ready, 
+				*(uint32_t *)pixel_message_incomming_p->message, 
+				pixel_message_incomming_p->len);
+			
+			if( xSemaphoreTake( pixel_message_incomming.pixel_data_semaphore, ( TickType_t ) 10 ) == pdTRUE )
+       		{
+				//Process the pixel data
+				ESP_LOGI(TAG, "Encoding and filling pixel data to spi tx buffer");
+				TLS3001_prep_color_packet(spi_ch1_tx_data_start, (uint16_t*)pixel_message_incomming.message, TLS3001_handle_ch1.num_pixels);
+				xSemaphoreGive( pixel_message_incomming.pixel_data_semaphore );
+       		}
+
+	
+		}
+			
+		if(got_color == true)
+		{
+			//Send colors
+			TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
+		}
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
 
     }
 }
 
-esp_err_t TLS3001_init(TLS3001_handle_s *TLS3001_handle)
+esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 {
 	esp_err_t ret;
-	uint16_t buffer_mem_size_byte;
+	uint16_t ch1_buffer_mem_size_byte;
 
-	buffer_mem_size_byte = (uint16_t ) ceil(((TLS3001_handle->config.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI)/8);
+	TLS3001_handle_ch1.num_pixels = num_pixels;
+	TLS3001_handle_ch1.spi_channel = HSPI_HOST;
+	TLS3001_handle_ch1.spi_handle = spi_ch1;
+	TLS3001_handle_ch1.spi_freq = 500000;
+	TLS3001_handle_ch1.spi_mosi_pin = CH1_PIN_NUM_MOSI;
+	TLS3001_handle_ch1.spi_clk_pin = CH1_PIN_NUM_CLK;
 
-	ret = init_spi_data_buffer(&spi_tx_data_start, buffer_mem_size_byte);
+
+	ch1_buffer_mem_size_byte = (uint16_t ) ceil(((TLS3001_handle_ch1.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI)/8);
+
+	if (SPI_init(&TLS3001_handle_ch1) != ESP_OK) {
+		printf("Error initializing spi\n");
+		while (1) {
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		}
+	}
+
+	ret = init_spi_data_buffer(&spi_ch1_tx_data_start, ch1_buffer_mem_size_byte);
 	if(ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "init_spi_data_buffer(): returned %d", ret);
 		return ret;
 	}
 
-	xTaskCreate(&TLS3001_task, "TLS3001_task", configMINIMAL_STACK_SIZE, TLS3001_handle, 5, TLS3001_handle->TLS3001_task_handle);
-	/*
-	if (!(pdPASS == xTaskCreatePinnedToCore(&TLS3001_task, "TLS3001_task", 4096, config, configMAX_PRIORITIES - 1, NULL, LOOP_CORE)))
+	xTaskCreate(&TLS3001_task, "TLS3001_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL);
+
+	ESP_LOGI(TAG, "TLS3001 ch1 initiated! Pixels: %d. Buffer memory size: %d", TLS3001_handle_ch1.num_pixels, ch1_buffer_mem_size_byte);
+
+	return ESP_OK;
+}
+
+static esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle)
+{
+	esp_err_t ret;
+
+	spi_bus_config_t buscfg = {
+		.miso_io_num = -1,
+		.mosi_io_num = TLS3001_handle->spi_mosi_pin,
+		.sclk_io_num = TLS3001_handle->spi_clk_pin,
+		.quadwp_io_num = -1,
+		.quadhd_io_num = -1
+	};
+	
+	//New config parameters for DMA
+	spi_device_interface_config_t devcfg = {
+		.command_bits = 0,
+		.address_bits = 0,
+		.dummy_bits = 0,
+		.clock_speed_hz = TLS3001_handle->spi_freq,
+		 	//Clock out at 6 MHz				
+		.mode = 1, 
+							//SPI mode 1		                               
+		.spics_io_num = -1,
+		 			//-1 if manually toggle CS 			
+		.queue_size = 1, 
+					//We want to be able to queue 4 transactions at a time        
+		.cs_ena_posttrans = 0, 
+				//CS hold post trans in us
+		.cs_ena_pretrans = 0, 
+				//CS setup time in us
+		.flags = (SPI_DEVICE_HALFDUPLEX) | (SPI_DEVICE_3WIRE),
+		.input_delay_ns = 0	
+		//.pre_cb = pre_cb_func,		//pre interrupt for manually toggle CS
+	    //.post_cb = post_cb_func			//post interrupt for manually toggle CS
+	};
+		
+	//Initialize the SPI bus with DMA channel 1
+	ret = spi_bus_initialize(TLS3001_handle->spi_channel, &buscfg, 1);
+	if (ret != ESP_OK)
 	{
-		return ESP_FAIL;
-	}*/
-
-	ESP_LOGI(TAG, "TLS3001 initiated! Pixels: %d. Buffer memory size: %d", TLS3001_handle->config.num_pixels, buffer_mem_size_byte);
-
+		ESP_LOGE(__func__, "spi_bus_initialize(): returned %d", ret);
+	}
+	assert(ret == ESP_OK);
+	
+	//Attach the device to the SPI bus
+	ret = spi_bus_add_device(TLS3001_handle->spi_channel, &devcfg, &TLS3001_handle->spi_handle);
+	if (ret != ESP_OK)
+	{
+		ESP_LOGE(__func__, "spi_bus_add_device(): returned %d", ret);
+	}
+	assert(ret == ESP_OK);
+	
 	return ESP_OK;
 }
 
@@ -109,7 +231,7 @@ static void deinit_spi_data_buffer(void *spi_manchester_data_p)
 }
 
 
-static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data, TLS3001_handle_s *self)
+static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *color_data, uint16_t num_pixels)
 {
 	uint8_t *spi_tx_data_last;
 	//Todo: make sure that pixel1_red starts with 0b0......
@@ -117,7 +239,8 @@ static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *colo
 
 	spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, START_CMD, START_CMD_LEN_MANCH, false);
 
-	if (self->config.num_pixels == 1)
+	//Remnove this if statement!! 
+	if (num_pixels == 1)
 	{
 		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+0 ), COLOR_DATA_LEN_MANCH, false);
 	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+1 ), COLOR_DATA_LEN_MANCH, false);
@@ -126,12 +249,12 @@ static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *colo
 	else
 	{
 		//For loop for filling 1 color of data at a time.
-		for (size_t i = 0; i < ((self->config.num_pixels*3)-1); i++)
+		for (size_t i = 0; i < ((num_pixels*3)-1); i++)
 		{
 			spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+i), COLOR_DATA_LEN_MANCH, false);
 		}
 
-		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+((self->config.num_pixels*3)-1) ), COLOR_DATA_LEN_MANCH, true);
+		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+((num_pixels*3)-1) ), COLOR_DATA_LEN_MANCH, true);
 
 	}
     
@@ -142,38 +265,47 @@ static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *colo
 static void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_t data_in, uint32_t bit_length_manch, bool last_segment_flag)
 {
 	
-	static uint8_t byte_temp = 0;
-	static uint8_t byte_pointer = 8;	
+	//ESP32 is a little endian chip whose lowest byte is stored in the very beginning of the address for a uint16 and uint32 variables. 
+	//SPI sends MSB first, meaning that it will send bit 7->0 in the memory. 
+
+	//This function takes a color data word (uint64_t) that could be data for one pixel or a start command, encodes it to manchester code, and stores it in memory from the starting point pointed by *spi_mem_data_p_start.
+	//The function also packs the manchester bits. I.e. if there are any remaining manchester bits at the end that did not fill an entire byte that could be written to memory, they are stored to the next iteration of the function. 
+	//If there are remaining bits left at the end AND the argument last_segment_flag is true, then they get padded with zeros and written to memory. 
+
+	static uint8_t manch_byte_temp = 0;
+	static uint8_t manch_byte_pointer = 8;	
 	static uint32_t mem_p_offset = 0;
 	uint8_t *spi_mem_data_p_last = spi_mem_data_p_start + mem_p_offset;
 
 	for (size_t i = 0; i < bit_length_manch; i++)
 	{
-		byte_pointer = byte_pointer - 2;
-		byte_temp |= (MANCHESTER_VALUE( (uint8_t)((data_in >> (bit_length_manch - i -1)) & 0x01) ) << byte_pointer);
+		manch_byte_pointer = manch_byte_pointer - 2;	//Offset with 2 bits to that a manchester bit can fit (1=10, 0=01)
+
+		//Comment this!!!
+		manch_byte_temp |= (MANCHESTER_VALUE( (uint8_t)((data_in >> (bit_length_manch - i -1)) & 0x01) ) << manch_byte_pointer);
 		
-		if (byte_pointer == 0)	//byte full. Write byte to memory
+		if (manch_byte_pointer == 0)	//byte full. Write byte to memory
 		{
-			*(spi_mem_data_p_start+mem_p_offset) = byte_temp;
+			*(spi_mem_data_p_start+mem_p_offset) = manch_byte_temp;
 			spi_mem_data_p_last = spi_mem_data_p_start+mem_p_offset;
 			mem_p_offset ++;	//Offset-pointer variable points to next free memory
 
-			byte_temp = 0;	//reset temporary byte 
-			byte_pointer = 8;
+			manch_byte_temp = 0;	//reset temporary byte 
+			manch_byte_pointer = 8;
 		}
 			
 	}
 
-	if((byte_pointer != 0) && (last_segment_flag == true))
+	if((manch_byte_pointer != 0) && (last_segment_flag == true))
 	{
 		//We have remaining manchester data that didnt make it to one entire byte
 
 		//Write last remaining data. Empty bits will be zero.
-		*(spi_mem_data_p_start+mem_p_offset) = byte_temp;
+		*(spi_mem_data_p_start+mem_p_offset) = manch_byte_temp;
 		spi_mem_data_p_last = spi_mem_data_p_start+mem_p_offset;
 
-		byte_temp = 0;	//reset temporary byte 
-		byte_pointer = 8;
+		manch_byte_temp = 0;	//reset temporary byte 
+		manch_byte_pointer = 8;
 		mem_p_offset = 0;	//reset pointer offset
 	
 	}
@@ -182,7 +314,7 @@ static void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_
 	return spi_mem_data_p_last;	
 }
 
-static esp_err_t TLS3001_send_packet(void *data, uint32_t length, TLS3001_handle_s *self)
+static esp_err_t TLS3001_send_packet(uint8_t *data, uint32_t length, spi_device_handle_t spi_handle)
 {
 	esp_err_t ret;
 	static spi_transaction_t t;
@@ -192,7 +324,7 @@ static esp_err_t TLS3001_send_packet(void *data, uint32_t length, TLS3001_handle
 	t.length = length;
 	t.rxlength = 0;
 	
-	ret = spi_device_polling_transmit(self->spi_handle, &t); 	//Transmit!
+	ret = spi_device_polling_transmit(spi_handle, &t); 	//Transmit!
 	if(ret != ESP_OK)
 	{
 		ESP_LOGW(__func__, "spi_device_transmit(): returned %d", ret);
@@ -202,19 +334,19 @@ static esp_err_t TLS3001_send_packet(void *data, uint32_t length, TLS3001_handle
 	return ESP_OK;
 }
 
-static esp_err_t TLS3001_send_color_packet(void *spi_tx_data_start, TLS3001_handle_s *self)
+static esp_err_t TLS3001_send_color_packet(uint8_t *spi_tx_data_start, uint16_t num_pixels, spi_device_handle_t spi_handle)
 {
-	//Function for sending start and colorpacket from memory pointed by arg spi_tx_data_start
+	//Function for sending start and colorpacket from memory pointed by arg self->spi_tx_data_start
 
 	esp_err_t ret;
-	ret = spi_device_acquire_bus(self->spi_handle, portMAX_DELAY);
+	ret = spi_device_acquire_bus(spi_handle, portMAX_DELAY);
 	if(ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "spi_device_acquire_bus(): returned %d", ret);
 		return ret;
 	}
 
-	ret = TLS3001_send_packet(spi_tx_data_start, ((self->config.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI), self);
+	ret = TLS3001_send_packet(spi_tx_data_start, ((num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI), spi_handle);
 	if(ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "TLS3001_send_packet(): returned %d", ret);
@@ -223,35 +355,38 @@ static esp_err_t TLS3001_send_color_packet(void *spi_tx_data_start, TLS3001_hand
 
 	ets_delay_us(150); 
 
-	ret = TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI, self);
+	ret = TLS3001_send_packet(&start_cmd, START_CMD_LEN_SPI, spi_handle);
 	if(ret != ESP_OK)
 	{
 		ESP_LOGE(__func__, "TLS3001_send_packet(): returned %d", ret);
 		return ret;
 	}
 
-	spi_device_release_bus(self->spi_handle);	
+	spi_device_release_bus(spi_handle);	
 
 	return ESP_OK;
 
 }
 
-static esp_err_t TLS3001_send_resetsynch_packet(void *spi_tx_data_start, TLS3001_handle_s *self) 
+static esp_err_t TLS3001_send_resetsynch_packet(spi_device_handle_t spi_handle) 
 {
-	ESP_ERROR_CHECK(spi_device_acquire_bus(self->spi_handle, portMAX_DELAY));
+	// See https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/peripherals/spi_master.html#bus-acquiring
+	ESP_ERROR_CHECK(spi_device_acquire_bus(spi_handle, portMAX_DELAY));
 
 	//Send RESET	
-	ESP_ERROR_CHECK(TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI,self));			
+	ESP_ERROR_CHECK(TLS3001_send_packet(&reset_cmd, RESET_CMD_LEN_SPI,spi_handle));			
 	
-	//Delays 1ms
+	//Delays 1ms. 
+	/*The ROM function ets_delay_us() (defined in rom/ets_sys.h) will allow you to busy-wait for a correct number of microseconds. 
+	Note that this is busy-waiting, so unlike vTaskDelay it does not allow other tasks to run (it just burns CPU cycles.)
+	*/
 	ets_delay_us(1000); 										
 	
 	//Send SYNCH
-	ESP_ERROR_CHECK(TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI,self));
+	ESP_ERROR_CHECK(TLS3001_send_packet(&synch_cmd, SYNCH_CMD_LEN_SPI,spi_handle));
 
-	spi_device_release_bus(self->spi_handle);
+	spi_device_release_bus(spi_handle);
 
-	ets_delay_us(SYNCH_DELAY_PER_PIXEL * self->config.num_pixels); 	//min delay of 28.34us times the number of pixels
 
 	return ESP_OK;
 }
