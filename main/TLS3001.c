@@ -101,6 +101,7 @@ static void TLS3001_task(void *arg)
 				*(uint32_t *)pixel_message_incomming_p->message, 
 				pixel_message_incomming_p->len);
 			
+			//Maybe add a check here so that the semiphore is actually created??
 			if( xSemaphoreTake( pixel_message_incomming.pixel_data_semaphore, ( TickType_t ) 10 ) == pdTRUE )
        		{
 				//Process the pixel data
