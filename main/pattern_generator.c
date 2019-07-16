@@ -77,7 +77,7 @@ esp_err_t pattern_init(uint16_t num_pixels)
 		return ESP_FAIL;
 	}
     */
-    vSemaphoreCreateBinary(pixel_message_pattern.pixel_data_semaphore);
+    pixel_message_pattern.pixel_data_semaphore = xSemaphoreCreateMutex();
 	
     xTaskCreate(&pattern_gen_task, "pattern_gen_task", 4096, NULL, 5, NULL);
 

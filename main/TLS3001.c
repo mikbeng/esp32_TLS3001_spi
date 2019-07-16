@@ -68,54 +68,28 @@ static void TLS3001_task(void *arg)
 
     while(1) {
 
-		/*
-		if(xTaskNotifyWait( 0x00,      // Don't clear any notification bits on entry. 
-                         ULONG_MAX, // Reset the notification value to 0 on exit. 
-                         &data_in_address, // Notified value pass out in ulNotifiedValue.                                        
-                         portMAX_DELAY ))  // Block indefinitely. 
-		{
-			//Notification was recieved
-			//Notification value is now saved in data_in_address variable. The notification value itself is set to zero upon exit of xTaskNotifyWait.
-
-			//try to take semipore
-			if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
-			{
-				// We were able to obtain the semaphore and can now access the
-				// shared resource.
-
-				// ...
-
-				// We have finished accessing the shared resource.  Release the
-				// semaphore.
-				xSemaphoreGive( xSemaphore );
-       		}
-		}*/
-
 		//Check incomming data queue. Could be from pattern task or cmd task!
 		
 		if(xQueueReceive(TLS3001_input_queue, &pixel_message_incomming, 10) == pdTRUE)
 		{
-			got_color = true;
-			ESP_LOGI(TAG, "Recieved pixel data on queue:\n Message ready: %u\n pointer: %u\n len: %u", 
+			ESP_LOGD(TAG, "Recieved pixel data on queue:\n Message ready: %u\n pointer: %u\n len: %u", 
 				pixel_message_incomming_p->message_ready, 
 				*(uint32_t *)pixel_message_incomming_p->message, 
 				pixel_message_incomming_p->len);
 			
-			//Maybe add a check here so that the semiphore is actually created??
 			if( xSemaphoreTake( pixel_message_incomming.pixel_data_semaphore, ( TickType_t ) 10 ) == pdTRUE )
        		{
+				got_color = true;
 				//Process the pixel data
-				ESP_LOGI(TAG, "Encoding and filling pixel data to spi tx buffer");
+				ESP_LOGD(TAG, "Encoding and filling pixel data to spi tx buffer");
 				TLS3001_prep_color_packet(spi_ch1_tx_data_start, (uint16_t*)pixel_message_incomming.message, TLS3001_handle_ch1.num_pixels);
 				xSemaphoreGive( pixel_message_incomming.pixel_data_semaphore );
        		}
-
-	
 		}
 			
 		if(got_color == true)
 		{
-			//Send colors
+			//Send colors. Will always send latest recieved color
 			TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 		}
 
@@ -240,25 +214,15 @@ static void TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *colo
 
 	spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, START_CMD, START_CMD_LEN_MANCH, false);
 
-	//Remnove this if statement!! 
-	if (num_pixels == 1)
+	//For loop for filling 1 color of data at a time.
+	for (size_t i = 0; i < ((num_pixels*3)-1); i++)
 	{
-		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+0 ), COLOR_DATA_LEN_MANCH, false);
-	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+1 ), COLOR_DATA_LEN_MANCH, false);
-	    spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+2 ), COLOR_DATA_LEN_MANCH, true);
+		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+i), COLOR_DATA_LEN_MANCH, false);
 	}
-	else
-	{
-		//For loop for filling 1 color of data at a time.
-		for (size_t i = 0; i < ((num_pixels*3)-1); i++)
-		{
-			spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+i), COLOR_DATA_LEN_MANCH, false);
-		}
 
-		spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+((num_pixels*3)-1) ), COLOR_DATA_LEN_MANCH, true);
+	spi_tx_data_last = pack_manchester_data_segment(spi_tx_data_start, (uint64_t)*(color_data+((num_pixels*3)-1) ), COLOR_DATA_LEN_MANCH, true);
 
-	}
-    
+
 
 } 
 
@@ -272,6 +236,7 @@ static void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_
 	//This function takes a color data word (uint64_t) that could be data for one pixel or a start command, encodes it to manchester code, and stores it in memory from the starting point pointed by *spi_mem_data_p_start.
 	//The function also packs the manchester bits. I.e. if there are any remaining manchester bits at the end that did not fill an entire byte that could be written to memory, they are stored to the next iteration of the function. 
 	//If there are remaining bits left at the end AND the argument last_segment_flag is true, then they get padded with zeros and written to memory. 
+	//These last zeros will be transmitted over SPI (since it can't transmit less than 1 byte), but it won't really matter since the manchester decoder will se "nothing".
 
 	static uint8_t manch_byte_temp = 0;
 	static uint8_t manch_byte_pointer = 8;	
@@ -280,9 +245,9 @@ static void *pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint64_
 
 	for (size_t i = 0; i < bit_length_manch; i++)
 	{
-		manch_byte_pointer = manch_byte_pointer - 2;	//Offset with 2 bits to that a manchester bit can fit (1=10, 0=01)
+		manch_byte_pointer = manch_byte_pointer - 2;	//Offset with 2 bits so that a manchester bit can fit (1=10, 0=01)
 
-		//Comment this!!!
+		//See issue for explanation of what goes on here: https://github.com/mikbeng/esp32_TLS3001_spi/issues/3
 		manch_byte_temp |= (MANCHESTER_VALUE( (uint8_t)((data_in >> (bit_length_manch - i -1)) & 0x01) ) << manch_byte_pointer);
 		
 		if (manch_byte_pointer == 0)	//byte full. Write byte to memory
