@@ -27,6 +27,8 @@ QueueHandle_t  TLS3001_input_queue;
 
 //#define configUSE_TASK_NOTIFICATIONS 1
 
+#define MAX_PIXELS 10
+
 void post_cb_func(spi_transaction_t* trans);
 
 void app_main()
@@ -36,7 +38,7 @@ void app_main()
     /* Set the GPIO as a push/pull output */
 	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-	uint16_t num_pixels_user = TEST_PIXELS;
+	uint16_t num_pixels_user = MAX_PIXELS;		//Maximum number of pixels on strip. 
 
 	TLS3001_input_queue=xQueueCreate(1,sizeof(pixel_message_s));
     if(TLS3001_input_queue == NULL){

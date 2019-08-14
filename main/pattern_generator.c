@@ -14,7 +14,7 @@ static const char * TAG = "pattern_gen";
 static void pattern_gen_task(void *arg);
 static void pattern_equal_color(uint16_t *input_color_array, uint16_t num_pixels, uint16_t *rgb);
 
-uint16_t test_color[3] = {3000, 0, 1000};
+uint16_t test_color[3] = {3000, 0, 0};
 uint16_t pattern_color_array[TEST_PIXELS];
 
 pixel_message_s pixel_message_pattern;

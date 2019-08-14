@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
-#define CH1_PIN_NUM_MOSI 5
+#define CH1_PIN_NUM_MOSI 23
 #define CH1_PIN_NUM_CLK  18
 
 #define MANCHESTER_ONE 0x02		//0b10
