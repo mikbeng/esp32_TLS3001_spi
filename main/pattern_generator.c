@@ -166,4 +166,4 @@ void pattern_shift_pixels_right(void *spi_tx_data_start, uint16_t pixel_index_st
 
     //uint16_t *pixel_pointer_start = &input_color_array + (pixel_index_start*3);
     
-}
+} 
