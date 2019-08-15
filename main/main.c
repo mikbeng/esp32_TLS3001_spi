@@ -22,12 +22,11 @@
 #include "TLS3001.h"
 #include "rom/ets_sys.h"
 #include "pattern_generator.h"
+#include "CLI_comp/CLI.h"
 
 QueueHandle_t  TLS3001_input_queue;
 
 //#define configUSE_TASK_NOTIFICATIONS 1
-
-#define MAX_PIXELS 10
 
 void post_cb_func(spi_transaction_t* trans);
 
@@ -44,6 +43,8 @@ void app_main()
     if(TLS3001_input_queue == NULL){
 		ESP_LOGE(__func__, "xQueueCreate() failed");
     }
+
+
 
 /*
 	volatile TLS3001_handle_s TLS3001_handle_ch1 = {
@@ -72,6 +73,8 @@ void app_main()
 
 	TLS3001_ch1_init(num_pixels_user);
 	pattern_init(num_pixels_user);
+
+	start_cli_passive_mode();
 
 	/*
 	if (!(pdPASS == xTaskCreatePinnedToCore(&TLS3001_task, "TLS3001_task", 4096, config, configMAX_PRIORITIES - 1, NULL, LOOP_CORE)))

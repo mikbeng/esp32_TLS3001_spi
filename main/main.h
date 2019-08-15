@@ -3,7 +3,7 @@
 #include "TLS3001.h"
 #include "freertos/queue.h"
 
-#define TEST_PIXELS 2
+#define MAX_PIXELS 361
 
 extern QueueHandle_t  TLS3001_input_queue;
 
