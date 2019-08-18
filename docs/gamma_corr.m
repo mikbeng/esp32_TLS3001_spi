@@ -27,3 +27,6 @@ gamma_corrected_uint16 = uint16(gamma_corrected);
 figure(2)
 clf
 plot(x2,gamma_corrected_uint16,'-.')
+
+gamma_corrected_uint16_matrix = vec2mat(gamma_corrected_uint16,20);
+

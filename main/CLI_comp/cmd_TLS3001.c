@@ -39,7 +39,7 @@ static int pixels_set_color_command(int argc, char** argv) {
 		return 1;
     }
 
-    token_color = strtok(set_all_pixel_color_args.rgb->sval[0], s);
+    token_color = strtok((char *)set_all_pixel_color_args.rgb->sval[0], s);
     int_color[0] = atoi(token_color);
 
     token_color = strtok(NULL, s);
@@ -50,7 +50,7 @@ static int pixels_set_color_command(int argc, char** argv) {
     
     ESP_LOGI(__func__,"%d,%d,%d",int_color[0],int_color[1],int_color[2]);
    
-    pattern_send_equal_color(&int_color, set_all_pixel_color_args.num_pixels->ival[0]);
+    pattern_send_equal_color(int_color, set_all_pixel_color_args.num_pixels->ival[0]);
 	//ESP_LOGI(__func__,"%d,%d,%d",set_all_pixel_color_args.red->ival[0], set_all_pixel_color_args.green->ival[0], set_all_pixel_color_args.blue->ival[0]);
 	return 0;
 }

@@ -1,8 +1,6 @@
-#Created by VisualGDB. Right-click on the component in Solution Explorer to edit properties using convenient GUI.
-
 set(COMPONENT_SRCS CLI.c cmd_system.c cmd_TLS3001.c ../pattern_generator.c)
 set(COMPONENT_ADD_INCLUDEDIRS ".")
 
-set(COMPONENT_REQUIRES fatfs nvs_flash console)
+set(COMPONENT_REQUIRES fatfs nvs_flash console freertos)
 
 register_component()

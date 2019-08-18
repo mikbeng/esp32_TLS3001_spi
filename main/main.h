@@ -4,6 +4,7 @@
 #include "freertos/queue.h"
 
 #define MAX_PIXELS 361
+#define USE_GAMMA_CORR 1
 
 extern QueueHandle_t  TLS3001_input_queue;
 
