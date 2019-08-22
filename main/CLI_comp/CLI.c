@@ -16,9 +16,6 @@
 #include "CLI.h"
 #include "CLI_cmd_decs.h"
 
-
-
-
 static const char *TAG = "CLI";
 TaskHandle_t xCLI_handle = NULL;
 
@@ -32,7 +29,6 @@ QueueHandle_t uart_queue = NULL;
 
 // CLI task
 bool cli_task_stop_flag = false;
-
 
 #if CONFIG_STORE_HISTORY
 #include "esp_vfs_fat.h"
@@ -53,20 +49,14 @@ static void initialize_filesystem() {
 	}
 }
 
-
 #endif //CONFIG_STORE_HISTORY
 
-
 void register_custom_commands() {
-	
 	/*	Register custom commands here */
-	
 	register_system();
 	register_TLS3001();
+	register_E131();
 }
-
-
-
 
 static void initialize_nvs() {
 	esp_err_t ret = nvs_flash_init();
@@ -80,7 +70,6 @@ static void initialize_nvs() {
 		ESP_LOGE(TAG, "Failed to initialize NVS Flash (%s)", esp_err_to_name(ret));
 	}
 }
-
 
 static void initialize_cli() {
 	// Disable bufering on stdin/out
@@ -128,7 +117,6 @@ static void initialize_cli() {
 	
 	ESP_ERROR_CHECK(esp_console_init(&console_config));
 	
-	
 	/* Configure linenoise line completion library */
 	/* Enable multiline editing. If not set, long commands will scroll within
 	 * single line.
@@ -146,15 +134,9 @@ static void initialize_cli() {
 	/* Load command history from filesystem */
 	linenoiseHistoryLoad(HISTORY_PATH);
 #endif
-	
 }
 
-
-
-
-
 void cli_init() {
-	
 	initialize_nvs();
 	
 #if CONFIG_STORE_HISTORY
@@ -169,21 +151,15 @@ void cli_init() {
 	
 	// Register custom commands from other components
 	register_custom_commands();
-	
 }
 
-
-
 void cli_task(void *p) {
-	
 	/* Prompt to be printed before each line.
 	 * This can be customized, made dynamic, etc.
 	 */
 	const char* prompt = LOG_COLOR_I "TLS3001_driver> " LOG_RESET_COLOR;
 	
-	
 	// Welcome message
-	
 	printf("\n"
 "  @@@@@@@  @@@        @@@@@@         @@@@@@    @@@@@@@@    @@@@@@@@     @@@\n"
 "  @@@@@@@  @@@       @@@@@@@         @@@@@@@  @@@@@@@@@@  @@@@@@@@@@   @@@@\n"
@@ -220,8 +196,6 @@ void cli_task(void *p) {
 		prompt = "pmstep> ";
 #endif //CONFIG_LOG_COLORS
 	}
-	
-	
 	
 	/* Main loop */
 	while (!cli_task_stop_flag) {
@@ -260,7 +234,6 @@ void cli_task(void *p) {
 		
 	}
 	ESP_LOGI(TAG, "cli_task_stop_flag = %d", cli_task_stop_flag);
-	
 
 	ESP_LOGI(TAG, "CLI stop request received. Exiting CLI...");
 	
@@ -270,7 +243,6 @@ void cli_task(void *p) {
 	ESP_LOGI(TAG, "\t>> Deleting task. \n\n Good bye\n");
 	vTaskDelete(xCLI_handle);
 }
-
 
 void start_cli() {
 	cli_init();
@@ -288,13 +260,11 @@ void stop_cli() {
 	}
 }
 
-
 /*
  * Code for cli passive mode.
  *		Passive mode waits for a activation phrase
  *		before initializing.
  **/
-
 bool check_uart_data(uint8_t * buf, size_t len) {
 	for (int i = 0; i < len; i++) {
 		if ((buf[i] >= 'a' && buf[i] <= 'z') || (buf[i] >= 'A' && buf[i] <= 'Z')) {
@@ -317,7 +287,6 @@ bool check_uart_data(uint8_t * buf, size_t len) {
 }
 
 void cli_passive_task(void* p) {
-	
 	uart_event_t event;
 	uint8_t* rxbuf = (uint8_t*) malloc(256);	//Increase this buffer to PIXELS*6 (2 bytes for each color, 3 colors in each pixel). Also maybe define it as a global so that it's not allocated on the stack.
 	while (1) {
@@ -347,7 +316,6 @@ void cli_passive_task(void* p) {
 					//TLS3001_uart_binary_parse(rxbuf, event.size, &TLS3001_color_array)	//Parses incomming binary uart data and fills the TLS3001_color_array 
 					//Then send it to the TLS3001_input_queue as in pattern_send_equal_color()
 					//finish by flushing the uart?
-
 					break;
 				default:
 					break;
@@ -359,8 +327,6 @@ void cli_passive_task(void* p) {
 }
 
 void start_cli_passive_mode() {
-	
-
 	num_detections = 0;
 	
 	ESP_LOGI(TAG, "Starting CLI P4551V3 listener");
@@ -389,3 +355,4 @@ void start_cli_passive_mode() {
 	xTaskCreatePinnedToCore(cli_passive_task, "cli_passive_task", 4096, NULL, 10, &x_cli_passive_handle, CONFIG_CLI_CORE);	
 	ESP_LOGI(TAG, "Setup complete. Activation Phrase = %s",activation_phrase);
 }
+

@@ -15,7 +15,6 @@ static struct {
 
 
 static int pixels_set_color_command(int argc, char** argv) {
-		
     const char s[2] = ","; 
     char *token_color;
     uint16_t int_color[3];
@@ -74,3 +73,4 @@ void register_TLS3001() {
 	};
 	esp_console_cmd_register(&set_mode_cmd);
 }
+

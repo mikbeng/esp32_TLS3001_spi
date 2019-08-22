@@ -17,6 +17,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "settings.h"
+
 static const char *TAG = "E1.31";
 e131_packet_t e131packet; /* Packet buffer */
 
@@ -27,6 +29,8 @@ uint16_t reverse(uint16_t num) {
 void e131task(void *pvParameters) {
 	struct netconn *conn;
 	err_t err;
+	
+	LoadSettings();
 
 	/* Create a new connection handle */
 	conn = netconn_new(NETCONN_UDP);
@@ -66,7 +70,7 @@ void e131task(void *pvParameters) {
 			//If packet is 638 bytes we handle it as a correct package and copy it to e131packet struct
 			memcpy(e131packet.raw, buf->p->payload, buf->p->tot_len);
 			e131packet.universe = reverse(e131packet.universe);
-			ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
+			//ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
 		} else {
 			printf("Wrong packet size.\n\n");
 		}
