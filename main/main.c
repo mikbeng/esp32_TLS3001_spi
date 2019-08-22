@@ -1,10 +1,7 @@
-/* Blink Example
+/* TLS3001 SPI
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+	Control interface for TLS3001 LED driver.
+	Controllable via UART and sACN (Streaming ACN, E1.31, aka. DMX512 over WiFi)
 */
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -33,5 +30,5 @@ void app_main()
 	pattern_init(num_pixels_user);
 
 	start_cli_passive_mode();	//Starts the CLI task
-
 }
+
