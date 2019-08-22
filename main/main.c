@@ -26,6 +26,7 @@
 #include "CLI_comp/CLI.h"
 #include "TLS3001.h"
 #include "pattern_generator.h"
+#include "e131.h"
 
 #define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
 #define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
@@ -96,5 +97,6 @@ void app_main()
 
 	initialise_wifi();
 	xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+	e131init();
 }
 
