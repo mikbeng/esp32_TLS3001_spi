@@ -346,7 +346,7 @@ void cli_passive_task(void* p) {
 						vTaskDelete(x_cli_passive_handle);
 					}
 
-					//uint16_t TLS3001_color_array[MAX_PIXELS*3];
+					//uint16_t TLS3001_color_array[PIXELS_CONNECTED*3];
 					//
 					//TLS3001_uart_binary_parse(rxbuf, event.size, &TLS3001_color_array)	//Parses incomming binary uart data and fills the TLS3001_color_array 
 					//Then send it to the TLS3001_input_queue as in pattern_send_equal_color()

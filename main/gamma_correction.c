@@ -1,5 +1,5 @@
-#include "main.h"
 #include "esp_log.h"
+#include "TLS3001.h"
 
 #ifdef USE_GAMMA_CORR
 

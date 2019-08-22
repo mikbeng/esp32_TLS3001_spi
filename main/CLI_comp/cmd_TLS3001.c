@@ -1,7 +1,7 @@
 #include "cmd_TLS3001.h"
 #include "argtable3/argtable3.h"
 #include "esp_console.h"
-#include "../main.h"
+#include "../TLS3001.h"
 #include "esp_log.h"
 #include "string.h"
 #include "../pattern_generator.h"
@@ -27,9 +27,9 @@ static int pixels_set_color_command(int argc, char** argv) {
 	}
 	
 	if (set_all_pixel_color_args.num_pixels->count > 0) {
-        if(set_all_pixel_color_args.num_pixels->ival[0] > MAX_PIXELS)
+        if(set_all_pixel_color_args.num_pixels->ival[0] > PIXELS_CONNECTED)
         {
-            ESP_LOGE(__func__, "Number of pixels is higher than MAX_PIXELS: %d", MAX_PIXELS);
+            ESP_LOGE(__func__, "Number of pixels is higher than PIXELS_CONNECTED: %d", PIXELS_CONNECTED);
             return 1;
         }
 	}

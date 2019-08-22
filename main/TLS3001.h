@@ -5,13 +5,17 @@
 #include "driver/spi_master.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
 
 #define CH1_PIN_NUM_MOSI 23
 #define CH1_PIN_NUM_CLK  18
 
+#define PIXELS_CONNECTED 361    //Total length of connected LED array. Even if not all pixels will be used, be sure to still specify the entire lenght here.
+#define USE_GAMMA_CORR 1        //Uncomment if gamma correction is not needed.
+
+/* ----- Manchester encoding stuff ------ */
 #define MANCHESTER_ONE 0x02		//0b10
 #define MANCHESTER_ZERO 0x01	//0b01
-
 #define MANCHESTER_VALUE(x)  ((x) ? MANCHESTER_ONE : MANCHESTER_ZERO)
 
 #define RESET_CMD 0x7FFF4
@@ -34,9 +38,9 @@
 
 #define RGB_PACKET_LEN_SPI (39*2)
 
-#define SYNCH_DELAY_PER_PIXEL (28.34)
+/* ------------------------------ */
 
-#define LOOP_CORE 1
+#define SYNCH_DELAY_PER_PIXEL (28.34)
 
 typedef struct
 {
@@ -51,13 +55,11 @@ typedef struct
 
 typedef struct 
 {
-bool message_ready;
-void *message;
-uint16_t len;
-SemaphoreHandle_t pixel_data_semaphore;
+uint16_t *color_data_p;                     //Pointer to uint16_t array that contains all the pixel data. I.e: {r,g,b,r,g,b,...,r,g,b}
+uint16_t pixel_len;                         //The number of pixels that the array contains.
+SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the data is thread-safe
 }pixel_message_s;
 
-extern TaskHandle_t TLS3001_send_task;
-
+extern QueueHandle_t  TLS3001_input_queue;
 esp_err_t TLS3001_ch1_init(uint16_t num_pixels);
 

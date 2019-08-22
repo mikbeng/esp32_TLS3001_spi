@@ -31,6 +31,7 @@ static const char * TAG = "TLS3001";
 static uint8_t reset_cmd[8];
 static uint8_t synch_cmd[8];
 static uint8_t start_cmd[8];
+
 static TLS3001_handle_s TLS3001_handle_ch1;
 //static TLS3001_handle_s TLS3001_handle_ch2;
 static spi_device_handle_t spi_ch1;
@@ -38,15 +39,14 @@ static spi_device_handle_t spi_ch1;
 static void * spi_ch1_tx_data_start;
 //static void * spi_ch2_tx_data_start;
 
-TaskHandle_t TLS3001_send_task;
 
-pixel_message_s pixel_message_incomming;
+QueueHandle_t  TLS3001_input_queue;		//Queue for sending pixel-data to the TLS3001 task that sends out data to the pixels via SPI
+
 
 static void TLS3001_task(void *arg)
 {
 
 	pixel_message_s *pixel_message_incomming_p;
-	pixel_message_incomming_p = &pixel_message_incomming;
 
 	bool got_color = false;
 
@@ -55,32 +55,35 @@ static void TLS3001_task(void *arg)
 
     while(1) {
 
-		//Check incomming data queue. Could be from pattern task or cmd task!
-		
-		if(xQueueReceive(TLS3001_input_queue, &pixel_message_incomming, 10) == pdTRUE)
+		//Check incomming data queue. Could be from cmd task or some other communication channel.
+		//NOTE: The incomming data will be a POINTER to structure containing the data.
+		if(xQueueReceive(TLS3001_input_queue, &(pixel_message_incomming_p), 10) == pdTRUE)
 		{
-			ESP_LOGD(TAG, "Recieved pixel data on queue:\n Message ready: %u\n pointer: %u\n len: %u", 
-				pixel_message_incomming_p->message_ready, 
-				*(uint32_t *)pixel_message_incomming_p->message, 
-				pixel_message_incomming_p->len);
+			ESP_LOGD(TAG, "Recieved pixel data on queue. Length: %u", pixel_message_incomming_p->pixel_len);
 			
-			if( xSemaphoreTake( pixel_message_incomming.pixel_data_semaphore, ( TickType_t ) 10 ) == pdTRUE )
+			//Since we only have a pointer to the data here, we need to make sure that no one else is using the data. Hence the semaphore protection.
+			//Try to obtain the semaphore.
+			if( xSemaphoreTake(pixel_message_incomming_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
        		{
 				got_color = true;
-				//Process the pixel data
+
+				//Process the pixel data. Fill the SPI buffer with new data.
 				ESP_LOGD(TAG, "Encoding and filling pixel data to spi tx buffer");
-				TLS3001_prep_color_packet(spi_ch1_tx_data_start, (uint16_t*)pixel_message_incomming.message, pixel_message_incomming_p->len);
-				xSemaphoreGive( pixel_message_incomming.pixel_data_semaphore );
+				TLS3001_prep_color_packet(spi_ch1_tx_data_start, pixel_message_incomming_p->color_data_p, pixel_message_incomming_p->pixel_len);
+
+				//Finished filling the SPI buffer with manchester coded data. Give back semaphore gaurd.
+				xSemaphoreGive( pixel_message_incomming_p->data_semaphore_guard );
        		}
 		}
-			
+
+		//Always send latest recieved color data, as long as we have recieved data once.	
 		if(got_color == true)
 		{
-			//Send colors. Will always send latest recieved color
+			//Send colors. Blocks until all data is sent.
 			TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 		}
 
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);	//Delay 100ms.
 
     }
 }
@@ -97,7 +100,14 @@ esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 	TLS3001_handle_ch1.spi_mosi_pin = CH1_PIN_NUM_MOSI;
 	TLS3001_handle_ch1.spi_clk_pin = CH1_PIN_NUM_CLK;
 
+	//Create a queue capable of containing 1 pointer to pixel_message_s structure.
+   	//This structure should be passed by pointer as it contains a lot of data.
+	TLS3001_input_queue=xQueueCreate(1, sizeof(pixel_message_s *));
+    if(TLS3001_input_queue == NULL){
+		ESP_LOGE(__func__, "xQueueCreate() failed");
+    }
 
+	//Calculate SPI buffer size
 	ch1_buffer_mem_size_byte = (uint16_t ) ceil(((TLS3001_handle_ch1.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI)/8);
 
 	if (SPI_init(&TLS3001_handle_ch1) != ESP_OK) {
