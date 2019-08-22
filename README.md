@@ -9,4 +9,4 @@ This repository contains code to communicate with the TLS3001 led-drivers. It's 
 ## Examples and how-to
 The library sends data over SPI to the TLS3001 drivers in a task called *TLS3001_task()*. See the ``send_to_TLS3001_task_template.c`` for a template on how to do this.  
 
-The code also contains a command-line interface. In order to build with this, the following flag in menuconfig must be set: ``CONFIG_FREERTOS_USE_TRACE_FACILITY=y`` 
+The code also contains a command-line interface. In order to build with this, the following flag in menuconfig must be set: ``CONFIG_FREERTOS_USE_TRACE_FACILITY=y`` This is already set in the file sdkconfig.defaults
