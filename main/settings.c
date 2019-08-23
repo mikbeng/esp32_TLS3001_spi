@@ -26,7 +26,7 @@ void LoadSettings() {
 	if (err != ESP_OK) {
 		ESP_LOGE(TAG, "Error %s opening NVS handle", esp_err_to_name(err));
 	} else {
-		uint32_t temp = 0;
+		uint32_t temp = 1;
 		err = nvs_get_u32(load_handle, "universeStart", &temp);
 		switch (err) {
 			case ESP_OK:

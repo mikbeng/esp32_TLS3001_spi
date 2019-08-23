@@ -30,8 +30,6 @@ void e131task(void *pvParameters) {
 	struct netconn *conn;
 	err_t err;
 	
-	LoadSettings();
-
 	/* Create a new connection handle */
 	conn = netconn_new(NETCONN_UDP);
 	if(!conn) {

@@ -27,6 +27,7 @@
 #include "TLS3001.h"
 #include "pattern_generator.h"
 #include "e131.h"
+#include "settings.h"
 
 #define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
 #define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
@@ -88,6 +89,7 @@ void app_main()
 		err = nvs_flash_init();
 	}
 	ESP_ERROR_CHECK( err );
+	LoadSettings();
 
 	uint16_t num_pixels_user = PIXELS_CONNECTED;	//Maximum number of pixels on strip. 361 for the one on my desk.
 

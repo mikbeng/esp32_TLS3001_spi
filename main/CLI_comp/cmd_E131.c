@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "string.h"
 #include "../pattern_generator.h"
+#include "../settings.h"
 
 
 static struct {
@@ -12,22 +13,26 @@ static struct {
 	struct arg_end * end;
 } e131_args;
 
+void printSettings() {
+	ESP_LOGI(__func__,"Stored Settings\n  Universe start: %d", settings.universeStart);
+}
 
 static int set_e131_command(int argc, char** argv) {
 	int nerrors = arg_parse(argc, argv, (void**) &e131_args);
 	if (nerrors != 0) {
 		arg_print_errors(stderr, e131_args.end, argv[0]);
+		printSettings();
 		return 1;
 	}
 	
-	if (e131_args.universeStart->count < 1) {
+	if (e131_args.universeStart->ival[0] < 1) {
         ESP_LOGE(__func__, "Start universe must be 1 or greater");
 		return 1;
     }
 	ESP_LOGI(__func__, "Arg universe %d", e131_args.universeStart->ival[0]);
 
-    //ESP_LOGI(__func__,"%d,%d,%d",int_color[0],int_color[1],int_color[2]);
-    //pattern_send_equal_color(int_color, e131_args.num_pixels->ival[0]);
+	settings.universeStart = e131_args.universeStart->ival[0];
+	SaveSettings();
 	return 0;
 }
 
