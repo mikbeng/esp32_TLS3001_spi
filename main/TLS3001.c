@@ -50,9 +50,6 @@ static void TLS3001_task(void *arg)
 
 	bool got_color = false;
 
-	TLS3001_send_resetsynch_packet(TLS3001_handle_ch1.spi_handle);
-	ets_delay_us(SYNCH_DELAY_PER_PIXEL * TLS3001_handle_ch1.num_pixels); 	//min delay of 28.34us times the number of pixels
-
     while(1) {
 
 		//Check incomming data queue. Could be from cmd task or some other communication channel.
@@ -124,11 +121,20 @@ esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 		return ret;
 	}
 
-	xTaskCreate(&TLS3001_task, "TLS3001_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL);
+	//xTaskCreate(&TLS3001_task, "TLS3001_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL);
 
 	ESP_LOGI(TAG, "TLS3001 ch1 initiated! Pixels: %d. Buffer memory size: %d", TLS3001_handle_ch1.num_pixels, ch1_buffer_mem_size_byte);
 
+	TLS3001_send_resetsynch_packet(TLS3001_handle_ch1.spi_handle);
+	ets_delay_us(SYNCH_DELAY_PER_PIXEL * TLS3001_handle_ch1.num_pixels); 	//min delay of 28.34us times the number of pixels
+
 	return ESP_OK;
+}
+
+void TLS3001_show(uint16_t *color_data, uint16_t num_pixels)
+{
+	TLS3001_prep_color_packet(spi_ch1_tx_data_start, color_data, num_pixels);
+	TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 }
 
 static esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle)
