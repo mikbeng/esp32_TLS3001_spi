@@ -13,34 +13,59 @@
 
 #define NUM_LEDS PIXELS_CONNECTED
 
-void RunningLights(uint16_t num_pixels, uint8_t red, uint8_t green, uint8_t blue, int WaveDelay);
-void colorWipe(uint16_t num_pixels, uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay);
-
 static const char * TAG = "pattern_gen";
 
 static void pattern_gen_task(void *arg);
+static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue);
+static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay);
+static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay);
 
 //Create a massage structure for this module (pattern_generator)
 static pixel_message_s pattern_data_packet;
-
 //Allocate a local color array buffer to be used as storing the color data.
 static uint16_t pattern_color_array[PIXELS_CONNECTED*3];
 
-// Pattern_gen_task. Not used at the moment.
+uint16_t num_pixels_setting;
+
+pattern_effect_enum pettern_effect;
+struct rgb_color_cmd_s
+{
+    uint16_t red;
+    uint16_t green;
+    uint16_t blue;
+}rgb_color;
+int effect_delay;
+
+
+
 void pattern_gen_task(void *arg)
 {   
-   vTaskDelay(2000 / portTICK_PERIOD_MS); 
-   //colorWipe(20,0x00,0xff,0x00, 50);
-   while(1)
+   
+    while(1)
     {
-        //RunningLights(10,0xff,0x00,0x00, 50);
-        colorWipe(20,0xff,0xff,0x00, 1);
-        colorWipe(20,0x00,0x00,0x00, 1);
-        //vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        switch (pettern_effect)
+        {
+        case equal_color:
+            pattern_equal_color(rgb_color.red, rgb_color.green, rgb_color.blue);
+            break;
+
+        case Running_Lights:
+            pattern_RunningLights((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay);
+            break;
+
+        case colorWipe:
+            pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay);
+            pattern_colorWipe(0x00,0x00,0x00, effect_delay);
+            break;       
+        default:
+            vTaskDelay(1 / portTICK_PERIOD_MS); 
+            break;
+        }
     }        
 }
 
-esp_err_t pattern_init(uint16_t num_pixels)
+esp_err_t pattern_init()
 {
     pattern_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
 	
@@ -51,11 +76,47 @@ esp_err_t pattern_init(uint16_t num_pixels)
     return ESP_OK;
 }
 
-void delay(int delay){
+static void delay(int delay){
     vTaskDelay(((uint32_t)delay) / portTICK_PERIOD_MS);
 }
 
-void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
+static void pattern_TLS3001_show()
+{
+    //Create a pointer to send over the queue
+    pixel_message_s *pattern_data_packet_tp;
+
+    //Set pointer to point at local pattern data structure
+    pattern_data_packet_tp = &pattern_data_packet;
+
+    if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
+        {
+            ESP_LOGI(TAG, "Generating equal color data");
+
+            pattern_data_packet_tp->color_data_p = &pattern_color_array;
+            pattern_data_packet_tp->pixel_len = num_pixels_setting;
+            
+            //Done with the data
+            xSemaphoreGive(pattern_data_packet_tp->data_semaphore_guard);
+
+            //Send copy of pointer to pixel_message_s structure to TLS3001 task
+            if(xQueueSend(TLS3001_input_queue, (void *) &pattern_data_packet_tp,(TickType_t )10))
+            {
+                ESP_LOGD(TAG, "successfully posted pattern data on queue");
+            }
+            else
+            {
+                ESP_LOGW(TAG, "Queue full. Did not post any data!");
+            }        
+
+        }
+    else
+        {
+            //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
+            ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
+        }
+}
+
+static void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
 
     //Convert 8bit to 12bit
     float ratio = 4095.0f/255.0f;
@@ -64,23 +125,8 @@ void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
     pattern_color_array[(Pixel*3)+2] = (uint16_t) blue*ratio;;
 }
 
-void showStrip(uint16_t num_pixels)
+static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue)
 {
-    /*
-    ESP_LOGI(TAG, "showStrip:\n");
-    for (size_t i = 0; i < num_pixels; i++)
-    {
-        ESP_LOGI(TAG, "pixel %d:[%d,%d,%d]",i,pattern_color_array[(i*3)+0],pattern_color_array[(i*3)+1],pattern_color_array[(i*3)+2]);
-    }
-    */
-    TLS3001_show(&pattern_color_array, num_pixels);
-}
-
-void pattern_send_equal_color(uint16_t *rgb, uint16_t num_pixels)
-{
-    uint16_t red = *rgb;
-    uint16_t green = *(rgb+1);
-    uint16_t blue = *(rgb+2);
 
     //Create a pointer to send over the queue
     pixel_message_s *pattern_data_packet_tp;
@@ -88,14 +134,18 @@ void pattern_send_equal_color(uint16_t *rgb, uint16_t num_pixels)
     //Set pointer to point at local pattern data structure
     pattern_data_packet_tp = &pattern_data_packet;
 
-    for (size_t i = 0; i < num_pixels; i++)
+    for (size_t i = 0; i < num_pixels_setting; i++)
 	{
         pattern_color_array[(i*3)+0] = red;
         pattern_color_array[(i*3)+1] = green;
         pattern_color_array[(i*3)+2] = blue;
 	}
 
-    if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
+  pattern_TLS3001_show(num_pixels_setting);
+  delay(100);
+
+/*
+  if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
     {
         ESP_LOGI(TAG, "Generating equal color data");
 
@@ -116,29 +166,22 @@ void pattern_send_equal_color(uint16_t *rgb, uint16_t num_pixels)
         }        
 
     }
-    else
+  else
     {
         //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
         ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
     }
-    
+*/
 
 }
 
-
-void pattern_shift_pixels_right(void *spi_tx_data_start, uint16_t pixel_index_start, uint16_t pixel_index_end, uint16_t num_pixels)
-{
-    //Not implemented yet.    
-} 
-
-
-void RunningLights(uint16_t num_pixels, uint8_t red, uint8_t green, uint8_t blue, int WaveDelay) {
+static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay) {
   int Position=0;
   
-  for(int i=0; i<num_pixels*2; i++)
+  for(int i=0; i<num_pixels_setting*2; i++)
   {
       Position++; // = 0; //Position + Rate;
-      for(int i=0; i<num_pixels; i++) {
+      for(int i=0; i<num_pixels_setting; i++) {
         // sine wave, 3 offset waves make a rainbow!
         //float level = sin(i+Position) * 127 + 128;
         //setPixel(i,level,0,0);
@@ -148,15 +191,15 @@ void RunningLights(uint16_t num_pixels, uint8_t red, uint8_t green, uint8_t blue
                    ((sin(i+Position) * 127 + 128)/255)*blue);
       }
       
-      showStrip(num_pixels);
+      pattern_TLS3001_show(num_pixels_setting);
       delay(WaveDelay);
   }
 }
 
-void colorWipe(uint16_t num_pixels, uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay) {
-  for(uint16_t i=0; i<num_pixels; i++) {
+static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay) {
+  for(uint16_t i=0; i<num_pixels_setting; i++) {
       setPixel(i, red, green, blue);
-      showStrip(num_pixels);
+      pattern_TLS3001_show(num_pixels_setting);
       delay(SpeedDelay);
   }
 }
@@ -198,3 +241,20 @@ void Fire(int Cooling, int Sparking, int SpeedDelay, uint16_t num_pixels) {
   delay(SpeedDelay);
 }
 */
+
+void pattern_set_effect(pattern_effect_enum pattern_effect_cmd, uint16_t *rgb_cmd, int delay_cmd)
+{
+    pettern_effect = pattern_effect_cmd;
+
+    rgb_color.red = *rgb_cmd;
+    rgb_color.green = *(rgb_cmd+1);
+    rgb_color.blue = *(rgb_cmd+2);
+    effect_delay = delay_cmd;
+
+}
+
+void pattern_set_pixel_number(uint16_t num_pixels)
+{
+    //Todo: Put semaphore guard here?
+    num_pixels_setting = num_pixels;
+}

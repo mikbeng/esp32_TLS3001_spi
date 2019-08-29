@@ -47,14 +47,14 @@ static void TLS3001_task(void *arg)
 {
 
 	pixel_message_s *pixel_message_incomming_p;
-
+	int64_t last_transmit = 0;
 	bool got_color = false;
 
     while(1) {
 
 		//Check incomming data queue. Could be from cmd task or some other communication channel.
 		//NOTE: The incomming data will be a POINTER to structure containing the data.
-		if(xQueueReceive(TLS3001_input_queue, &(pixel_message_incomming_p), 10) == pdTRUE)
+		if(xQueueReceive(TLS3001_input_queue, &(pixel_message_incomming_p), (100 / portTICK_PERIOD_MS)) == pdTRUE)
 		{
 			ESP_LOGD(TAG, "Recieved pixel data on queue. Length: %u", pixel_message_incomming_p->pixel_len);
 			
@@ -65,22 +65,22 @@ static void TLS3001_task(void *arg)
 				got_color = true;
 
 				//Process the pixel data. Fill the SPI buffer with new data.
-				ESP_LOGD(TAG, "Encoding and filling pixel data to spi tx buffer");
+				ESP_LOGD(TAG, "Encoding and filling pixel data to spi tx buffer. Sending over SPI");
 				TLS3001_prep_color_packet(spi_ch1_tx_data_start, pixel_message_incomming_p->color_data_p, pixel_message_incomming_p->pixel_len);
+				//Send colors. Blocks until all data is sent.
+				TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 
 				//Finished filling the SPI buffer with manchester coded data. Give back semaphore gaurd.
 				xSemaphoreGive( pixel_message_incomming_p->data_semaphore_guard );
+
+				last_transmit = esp_timer_get_time();
        		}
 		}
-
-		//Always send latest recieved color data, as long as we have recieved data once.	
-		if(got_color == true)
+		else	//Send last received color if nothing was present on the queue for 100ms
 		{
 			//Send colors. Blocks until all data is sent.
 			TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 		}
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);	//Delay 100ms.
 
     }
 }
