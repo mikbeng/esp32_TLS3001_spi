@@ -43,7 +43,7 @@ static int pattern_pixel_number_command(int argc, char** argv) {
         ESP_LOGE(__func__, "Number of pixels must be specified");
 		return 1;
     }
-
+	ESP_LOGI(__func__, "pixels: %d", pattern_pixel_number_args.num_pixels->ival[0]);
     pattern_set_pixel_number(pattern_pixel_number_args.num_pixels->ival[0]);
 
 	return 0;
@@ -118,7 +118,7 @@ void register_TLS3001() {
 
     // ------------  set pixel number command
     pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to lit");
-    pattern_equal_color_args.end = arg_end(2);
+    pattern_pixel_number_args.end = arg_end(2);
 	
 	const esp_console_cmd_t set_pixel_number_cmd = { 
 		.command = "pattern_pixel_number",

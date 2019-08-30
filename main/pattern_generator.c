@@ -25,9 +25,10 @@ static pixel_message_s pattern_data_packet;
 //Allocate a local color array buffer to be used as storing the color data.
 static uint16_t pattern_color_array[PIXELS_CONNECTED*3];
 
-uint16_t num_pixels_setting;
+static uint16_t num_pixels_setting;
 
-pattern_effect_enum pettern_effect;
+pattern_effect_enum pettern_effect = 0;
+
 struct rgb_color_cmd_s
 {
     uint16_t red;
@@ -59,7 +60,8 @@ void pattern_gen_task(void *arg)
             pattern_colorWipe(0x00,0x00,0x00, effect_delay);
             break;       
         default:
-            vTaskDelay(1 / portTICK_PERIOD_MS); 
+            //ESP_LOGI(TAG, "switch default. pettern_effect:%d", pettern_effect);
+            vTaskDelay(10 / portTICK_PERIOD_MS); 
             break;
         }
     }        
@@ -90,7 +92,7 @@ static void pattern_TLS3001_show()
 
     if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
         {
-            ESP_LOGI(TAG, "Generating equal color data");
+            //ESP_LOGD(TAG, "Generating equal color data");
 
             pattern_data_packet_tp->color_data_p = &pattern_color_array;
             pattern_data_packet_tp->pixel_len = num_pixels_setting;
@@ -101,7 +103,7 @@ static void pattern_TLS3001_show()
             //Send copy of pointer to pixel_message_s structure to TLS3001 task
             if(xQueueSend(TLS3001_input_queue, (void *) &pattern_data_packet_tp,(TickType_t )10))
             {
-                ESP_LOGD(TAG, "successfully posted pattern data on queue");
+                //ESP_LOGD(TAG, "successfully posted pattern data on queue. Pixels: %d", pattern_data_packet_tp->pixel_len);
             }
             else
             {
