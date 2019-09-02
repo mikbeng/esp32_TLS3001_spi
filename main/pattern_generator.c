@@ -21,7 +21,7 @@ static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int 
 static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay);
 
 //Create a massage structure for this module (pattern_generator)
-static pixel_message_s pattern_data_packet;
+static pixel_message_s TLS3001_data_packet;
 //Allocate a local color array buffer to be used as storing the color data.
 static uint16_t pattern_color_array[PIXELS_CONNECTED*3];
 
@@ -60,7 +60,6 @@ void pattern_gen_task(void *arg)
             pattern_colorWipe(0x00,0x00,0x00, effect_delay);
             break;       
         default:
-            //ESP_LOGI(TAG, "switch default. pettern_effect:%d", pettern_effect);
             vTaskDelay(10 / portTICK_PERIOD_MS); 
             break;
         }
@@ -69,7 +68,7 @@ void pattern_gen_task(void *arg)
 
 esp_err_t pattern_init()
 {
-    pattern_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
+    TLS3001_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
 	
     xTaskCreate(&pattern_gen_task, "pattern_gen_task", 4096, NULL, 5, NULL);
 
@@ -85,25 +84,25 @@ static void delay(int delay){
 static void pattern_TLS3001_show()
 {
     //Create a pointer to send over the queue
-    pixel_message_s *pattern_data_packet_tp;
+    pixel_message_s *TLS3001_data_packet_p = &TLS3001_data_packet;
 
     //Set pointer to point at local pattern data structure
-    pattern_data_packet_tp = &pattern_data_packet;
+    //pattern_data_packet_tp = &pattern_data_packet;
 
-    if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
+    if( xSemaphoreTake(TLS3001_data_packet_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
         {
             //ESP_LOGD(TAG, "Generating equal color data");
 
-            pattern_data_packet_tp->color_data_p = &pattern_color_array;
-            pattern_data_packet_tp->pixel_len = num_pixels_setting;
+            TLS3001_data_packet_p->color_data_p = &pattern_color_array;
+            TLS3001_data_packet_p->pixel_len = num_pixels_setting;
             
             //Done with the data
-            xSemaphoreGive(pattern_data_packet_tp->data_semaphore_guard);
+            xSemaphoreGive(TLS3001_data_packet_p->data_semaphore_guard);
 
             //Send copy of pointer to pixel_message_s structure to TLS3001 task
-            if(xQueueSend(TLS3001_input_queue, (void *) &pattern_data_packet_tp,(TickType_t )10))
+            if(xQueueSend(TLS3001_input_queue, (void *) &TLS3001_data_packet_p,(TickType_t )10))
             {
-                //ESP_LOGD(TAG, "successfully posted pattern data on queue. Pixels: %d", pattern_data_packet_tp->pixel_len);
+                //ESP_LOGD(TAG, "successfully posted pattern data on queue. Pixels: %d", TLS3001_data_packet_p->pixel_len);
             }
             else
             {
@@ -129,12 +128,6 @@ static void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
 
 static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue)
 {
-
-    //Create a pointer to send over the queue
-    pixel_message_s *pattern_data_packet_tp;
-
-    //Set pointer to point at local pattern data structure
-    pattern_data_packet_tp = &pattern_data_packet;
 
     for (size_t i = 0; i < num_pixels_setting; i++)
 	{

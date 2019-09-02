@@ -58,7 +58,7 @@ static void TLS3001_task(void *arg)
 
 		//Check incomming data queue. Could be from cmd task or some other communication channel.
 		//NOTE: The incomming data will be a POINTER to structure containing the data.
-		if(xQueueReceive(TLS3001_input_queue, &(pixel_message_incomming_p), (1000 / portTICK_PERIOD_MS)) == pdTRUE)
+		if(xQueueReceive(TLS3001_input_queue, &(pixel_message_incomming_p), (300 / portTICK_PERIOD_MS)) == pdTRUE)
 		{
 			//ESP_LOGD(TAG, "Recieved pixel data on queue. Length: %u", pixel_message_incomming_p->pixel_len);
 			
@@ -79,7 +79,7 @@ static void TLS3001_task(void *arg)
 				got_color = true;
        		}
 		}
-		else	//Send last received color if nothing was present on the queue for 1000ms
+		else	//Send last received color if nothing was present on the queue for 300ms
 		{
 			if(got_color)
 			{
@@ -134,12 +134,6 @@ esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 	ESP_LOGI(TAG, "TLS3001 ch1 initiated! Pixels: %d. Buffer memory size: %d", TLS3001_handle_ch1.num_pixels, ch1_buffer_mem_size_byte);
 
 	return ESP_OK;
-}
-
-void TLS3001_show(uint16_t *color_data, uint16_t num_pixels)
-{
-	TLS3001_prep_color_packet(spi_ch1_tx_data_start, color_data, num_pixels);
-	TLS3001_send_color_packet(spi_ch1_tx_data_start,TLS3001_handle_ch1.num_pixels, TLS3001_handle_ch1.spi_handle);
 }
 
 static esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle)
