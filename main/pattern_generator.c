@@ -16,9 +16,9 @@
 static const char * TAG = "pattern_gen";
 
 static void pattern_gen_task(void *arg);
-static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue);
-static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay);
-static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay);
+static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue, uint16_t num_pixels);
+static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay, uint16_t num_pixels);
+static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay, uint16_t num_pixels);
 
 //Create a massage structure for this module (pattern_generator)
 static pixel_message_s TLS3001_data_packet;
@@ -48,16 +48,16 @@ void pattern_gen_task(void *arg)
         switch (pettern_effect)
         {
         case equal_color:
-            pattern_equal_color(rgb_color.red, rgb_color.green, rgb_color.blue);
+            pattern_equal_color(rgb_color.red, rgb_color.green, rgb_color.blue, num_pixels_setting);
             break;
 
         case Running_Lights:
-            pattern_RunningLights((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay);
+            pattern_RunningLights((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, num_pixels_setting);
             break;
 
         case colorWipe:
-            pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay);
-            pattern_colorWipe(0x00,0x00,0x00, effect_delay);
+            pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, num_pixels_setting);
+            pattern_colorWipe(0x00,0x00,0x00, effect_delay, num_pixels_setting);
             break;       
         default:
             vTaskDelay(10 / portTICK_PERIOD_MS); 
@@ -126,17 +126,17 @@ static void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
     pattern_color_array[(Pixel*3)+2] = (uint16_t) blue*ratio;;
 }
 
-static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue)
+static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue, uint16_t num_pixels)
 {
 
-    for (size_t i = 0; i < num_pixels_setting; i++)
+    for (size_t i = 0; i < num_pixels; i++)
 	{
         pattern_color_array[(i*3)+0] = red;
         pattern_color_array[(i*3)+1] = green;
         pattern_color_array[(i*3)+2] = blue;
 	}
 
-  pattern_TLS3001_show(num_pixels_setting);
+  pattern_TLS3001_show(num_pixels);
   delay(100);
 
 /*
@@ -170,13 +170,13 @@ static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue)
 
 }
 
-static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay) {
+static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int WaveDelay, uint16_t num_pixels) {
   int Position=0;
   
-  for(int i=0; i<num_pixels_setting*2; i++)
+  for(int i=0; i<num_pixels*2; i++)
   {
       Position++; // = 0; //Position + Rate;
-      for(int i=0; i<num_pixels_setting; i++) {
+      for(int i=0; i<num_pixels; i++) {
         // sine wave, 3 offset waves make a rainbow!
         //float level = sin(i+Position) * 127 + 128;
         //setPixel(i,level,0,0);
@@ -185,16 +185,16 @@ static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int 
                    ((sin(i+Position) * 127 + 128)/255)*green,
                    ((sin(i+Position) * 127 + 128)/255)*blue);
       }
-      
-      pattern_TLS3001_show(num_pixels_setting);
+
+      pattern_TLS3001_show(num_pixels);
       delay(WaveDelay);
   }
 }
 
-static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay) {
-  for(uint16_t i=0; i<num_pixels_setting; i++) {
+static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay, uint16_t num_pixels) {
+  for(uint16_t i=0; i<num_pixels; i++) {
       setPixel(i, red, green, blue);
-      pattern_TLS3001_show(num_pixels_setting);
+      pattern_TLS3001_show(num_pixels);
       delay(SpeedDelay);
   }
 }
