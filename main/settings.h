@@ -4,7 +4,11 @@
 #include <stdint.h>
 
 typedef struct {
-	uint32_t universeStart;
+	uint16_t universeStart;
+    uint16_t universeStop;
+    uint16_t dmx_start;
+    char ssid[32];  
+    char password[64];
 } settings_t;
 
 settings_t settings;

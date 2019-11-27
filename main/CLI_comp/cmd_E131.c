@@ -13,7 +13,7 @@ static struct {
 	struct arg_end * end;
 } e131_args;
 
-void printSettings() {
+static void printSettings() {
 	ESP_LOGI(__func__,"Stored Settings\n  Universe start: %d", settings.universeStart);
 }
 

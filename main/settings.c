@@ -26,17 +26,64 @@ void LoadSettings() {
 	if (err != ESP_OK) {
 		ESP_LOGE(TAG, "Error %s opening NVS handle", esp_err_to_name(err));
 	} else {
-		uint32_t temp = 1;
-		err = nvs_get_u32(load_handle, "universeStart", &temp);
+		err = nvs_get_u16(load_handle, "universeStart", &settings.universeStart);
 		switch (err) {
 			case ESP_OK:
-				settings.universeStart = temp;
 				break;
 			case ESP_ERR_NVS_NOT_FOUND:
-				ESP_LOGI(TAG, "The universeStart is not initialized yet %d", err);
+                settings.universeStart = 1;
+				ESP_LOGI(TAG, "The universeStart is not initialized yet. Setting to default value: %d", settings.universeStart);
 				break;
 			default:
 				ESP_LOGE(TAG, "Error %s reading universeStart", esp_err_to_name(err));
+		}
+
+        err = nvs_get_u16(load_handle, "universeStop", &settings.universeStop);
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+                settings.universeStart = 2;
+				ESP_LOGI(TAG, "The universeStop is not initialized yet. Setting to default value: %d", settings.universeStop);
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading universeStop", esp_err_to_name(err));
+		}
+
+        err = nvs_get_u16(load_handle, "dmx_start", &settings.dmx_start);
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+                settings.dmx_start = 1;
+				ESP_LOGI(TAG, "The dmx_start is not initialized yet. Setting to default value: %d", settings.dmx_start);
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading dmx_start", esp_err_to_name(err));
+		}
+
+        err = nvs_get_str(load_handle, "ssid", &settings.ssid, sizeof(settings.ssid));
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+                settings.ssid[0] = "\0";
+				ESP_LOGI(TAG, "The ssid is not initialized yet. Setting to blank");
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading ssid", esp_err_to_name(err));
+		}
+
+        err = nvs_get_str(load_handle, "password", &settings.password, sizeof(settings.password));
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+                settings.password[0] = "\0";
+				ESP_LOGI(TAG, "The password is not initialized yet. Setting to blank");
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading password", esp_err_to_name(err));
 		}
 	}
 
@@ -58,12 +105,30 @@ void SaveSettings() {
 	if (err != ESP_OK) {
 		ESP_LOGE(TAG, "Error %s opening NVS handle", esp_err_to_name(err));
 	} else {
-		int32_t temp = 0;
-		temp = settings.universeStart;
-		err = nvs_set_u32(save_handle, "universeStart", temp);
+		err = nvs_set_u16(save_handle, "universeStart", settings.universeStart);
 		if (err != ESP_OK) {
 			ESP_LOGE(TAG, "Error %s saving universeStart", esp_err_to_name(err));
 		}
+
+        err = nvs_set_u16(save_handle, "universeStop", settings.universeStop);
+		if (err != ESP_OK) {
+			ESP_LOGE(TAG, "Error %s saving universeStop", esp_err_to_name(err));
+		}
+
+        err = nvs_set_u16(save_handle, "dmx_start", settings.dmx_start);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Error %s saving dmx_start", esp_err_to_name(err));
+        }
+
+        err = nvs_set_str(save_handle, "ssid", settings.ssid);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Error %s saving ssid", esp_err_to_name(err));
+        }
+
+        err = nvs_set_str(save_handle, "password", settings.password);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Error %s saving password", esp_err_to_name(err));
+        }
 
 		err = nvs_commit(save_handle);
 		if (err != ESP_OK) {
@@ -73,4 +138,6 @@ void SaveSettings() {
 
 	nvs_close(save_handle);
 }
+
+
 

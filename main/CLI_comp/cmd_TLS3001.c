@@ -154,12 +154,6 @@ static int pattern_equal_color_command(int argc, char** argv) {
 
 void register_TLS3001() {
 
-    // ------------  set pixel color command
-	set_all_pixel_color_args.rgb = arg_str1(NULL, NULL, "<r,g,b>", "rgb color data values 12 bits (0-4095)");
-    //set_all_pixel_color_args.green = arg_int1("g", "green", "<green>", "green color data value 12 bits (0-4095)");
-    //set_all_pixel_color_args.blue = arg_int1("b", "blue", "<blue>", "blue color data value 12 bits (0-4095)");
-	set_all_pixel_color_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to lit");
-
     // ------------  set pixel number command
     pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to lit");
     pattern_pixel_number_args.end = arg_end(2);

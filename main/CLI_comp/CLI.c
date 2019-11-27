@@ -56,6 +56,7 @@ void register_custom_commands() {
 	register_system();
 	register_TLS3001();
 	register_E131();
+    register_wifi();
 }
 
 static void initialize_nvs() {

@@ -29,8 +29,6 @@
 #include "e131.h"
 #include "settings.h"
 
-#define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
-#define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
 static const char *TAG = "TLS3001";
 
 /* FreeRTOS event group to signal when we are connected & ready to make a request */
@@ -68,12 +66,11 @@ static void initialise_wifi(void) {
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
 	ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-	wifi_config_t wifi_config = {
-		.sta = {
-			.ssid = EXAMPLE_WIFI_SSID,
-			.password = EXAMPLE_WIFI_PASS,
-		},
-	};
+
+    wifi_config_t wifi_config;
+    strcpy((const char *) &wifi_config.sta.ssid, &settings.ssid);
+    strcpy((const char *) &wifi_config.sta.password, &settings.password);
+
 	ESP_LOGI(TAG, "Setting WiFi configuration SSID %s...", wifi_config.sta.ssid);
 	ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
 	ESP_ERROR_CHECK( esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
