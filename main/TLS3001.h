@@ -63,3 +63,5 @@ SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the
 extern QueueHandle_t  TLS3001_input_queue;
 esp_err_t TLS3001_ch1_init(uint16_t num_pixels);
 
+void TLS3001_show(uint16_t *color_data, uint16_t num_pixels);
+

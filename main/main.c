@@ -91,10 +91,11 @@ void app_main()
 	ESP_ERROR_CHECK( err );
 	LoadSettings();
 
-	uint16_t num_pixels_user = PIXELS_CONNECTED;	//Maximum number of pixels on strip. 361 for the one on my desk.
+	uint16_t num_pixels_user = PIXELS_CONNECTED;		//Maximum number of pixels on strip. 361 for the one on my desk.
 
 	TLS3001_ch1_init(num_pixels_user);
-	pattern_init(num_pixels_user);
+	pattern_init();
+
 	start_cli_passive_mode();	//Starts the CLI task
 
 	initialise_wifi();
