@@ -1,15 +1,14 @@
-
 #include "TLS3001.h"
 #include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/gpio.h"
-#include "stdint.h"
-#include "stdbool.h"
-#include <string.h>
-#include "esp_heap_caps.h"
 #include "driver/spi_master.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
 #include "main.h"
@@ -370,7 +369,6 @@ static esp_err_t TLS3001_send_color_packet(uint8_t *spi_tx_data_start, uint16_t 
 
 static esp_err_t TLS3001_send_resetsynch_packet(spi_device_handle_t spi_handle) 
 {
-
 	// Prepare the reset and synch commands
 	pack_manchester_data_segment(reset_cmd, RESET_CMD, RESET_CMD_LEN_MANCH, true);	
 	pack_manchester_data_segment(synch_cmd, SYNCH_CMD, SYNCH_CMD_LEN_MANCH, true);
@@ -396,3 +394,4 @@ static esp_err_t TLS3001_send_resetsynch_packet(spi_device_handle_t spi_handle)
 
 	return ESP_OK;
 }
+

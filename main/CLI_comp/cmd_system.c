@@ -89,7 +89,7 @@ void register_system() {
 	
 	const esp_console_cmd_t reboot_cmd = {
 			.command = "reboot",
-		.help = "Reboots PMStep",
+		.help = "Reboot ESP32",
 		.argtable = NULL,
 		.func = system_reboot_comand,
 		.hint = NULL
