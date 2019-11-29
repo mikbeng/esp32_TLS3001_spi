@@ -84,11 +84,11 @@ static void delay(int delay){
 static void pattern_TLS3001_show()
 {
     //Create a pointer to send over the queue
-    pixel_message_s *TLS3001_data_packet_p = &TLS3001_data_packet;
+    //pixel_message_s *TLS3001_data_packet_p = &TLS3001_data_packet;
 
-    //Set pointer to point at local pattern data structure
-    //pattern_data_packet_tp = &pattern_data_packet;
-
+    TLS3001_send_to_queue(&TLS3001_data_packet, &pattern_color_array, num_pixels_setting);
+    
+    /*
     if( xSemaphoreTake(TLS3001_data_packet_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
         {
             //ESP_LOGD(TAG, "Generating equal color data");
@@ -115,6 +115,7 @@ static void pattern_TLS3001_show()
             //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
             ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
         }
+        */
 }
 
 static void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {

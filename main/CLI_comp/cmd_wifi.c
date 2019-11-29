@@ -12,7 +12,7 @@ static struct {
 } wifi_args;
 
 static void printSettings() {
-	ESP_LOGI(__func__,"Stored Settings\n  ssid: %s, password %s", settings.ssid, settings.password);
+	ESP_LOGI(__func__,"Stored Settings\n  ssid: '%s'\npassword '%s'", settings.ssid, settings.password);
 }
 
 static int set_wifi_command(int argc, char** argv) {
@@ -22,7 +22,7 @@ static int set_wifi_command(int argc, char** argv) {
 		printSettings();
 		return 1;
 	}
-	
+
 	if (*wifi_args.ssid->sval[0] != '\0') {
         strcpy(&settings.ssid, wifi_args.ssid->sval[0]);
         ESP_LOGI(__func__,"ssid set to: %s", settings.ssid);
@@ -39,8 +39,8 @@ static int set_wifi_command(int argc, char** argv) {
 }
 
 void register_wifi() {
-	wifi_args.ssid = arg_str0("s", "ssid", "<ssid>", "WiFi SSID");
-    wifi_args.pass = arg_str0("p", "pass", "<password>", "WiFi password");
+	wifi_args.ssid = arg_str1("s", "ssid", "<ssid>", "WiFi SSID");
+    wifi_args.pass = arg_str1("p", "pass", "<password>", "WiFi password");
 
     wifi_args.end = arg_end(2);
 	

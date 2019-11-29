@@ -60,8 +60,9 @@ uint16_t pixel_len;                         //The number of pixels that the arra
 SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the data is thread-safe
 }pixel_message_s;
 
-extern QueueHandle_t  TLS3001_input_queue;
+//extern QueueHandle_t  TLS3001_input_queue;
 esp_err_t TLS3001_ch1_init(uint16_t num_pixels);
+esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint16_t *color_array, uint16_t pixel_len);
 
 void TLS3001_show(uint16_t *color_data, uint16_t num_pixels);
 

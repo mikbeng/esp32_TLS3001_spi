@@ -18,9 +18,12 @@
 #include <stdint.h>
 
 #include "settings.h"
+#include "TLS3001.h"
 
 static const char *TAG = "E1.31";
 e131_packet_t e131packet; /* Packet buffer */
+
+pixel_message_s pixel_data_packet;	//pixel data packet
 
 uint16_t reverse(uint16_t num) {
 	return (num>>8) | (num<<8);
@@ -78,6 +81,10 @@ void e131task(void *pvParameters) {
 }
 
 void e131init() {
+	
+	//create mutex for pixel data
+	pixel_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
+
 	xTaskCreate(&e131task, "E131_task", 4096, NULL, 5, NULL);
 }
 

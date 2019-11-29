@@ -141,6 +141,37 @@ esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 	return ESP_OK;
 }
 
+esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint16_t *color_array, uint16_t pixel_len)
+{
+	if( xSemaphoreTake(pixel_message_packet_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
+    {
+
+        pixel_message_packet_p->color_data_p = color_array;
+        pixel_message_packet_p->pixel_len = pixel_len;
+        
+        //Done with the data
+        xSemaphoreGive(pixel_message_packet_p->data_semaphore_guard);
+
+        //Send copy of pointer to pixel_message_s structure to TLS3001 task
+        if(xQueueSend(TLS3001_input_queue, (void *) &pixel_message_packet_p,(TickType_t )10))
+        {
+            ESP_LOGI(TAG, "successfully posted pattern data on queue");
+        }
+        else
+        {
+            ESP_LOGW(TAG, "Queue full. Did not post any data!");
+        }        
+
+    }
+    else
+    {
+        //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
+        ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
+    }
+
+	return ESP_OK;
+}
+
 static esp_err_t SPI_init(TLS3001_handle_s *TLS3001_handle)
 {
 	esp_err_t ret;

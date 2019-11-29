@@ -22,6 +22,8 @@ void LoadSettings() {
 	ESP_ERROR_CHECK(err);
 
 	nvs_handle load_handle;
+	size_t str_len;
+
 	err = nvs_open("storage", NVS_READWRITE, &load_handle);
 	if (err != ESP_OK) {
 		ESP_LOGE(TAG, "Error %s opening NVS handle", esp_err_to_name(err));
@@ -43,7 +45,7 @@ void LoadSettings() {
 			case ESP_OK:
 				break;
 			case ESP_ERR_NVS_NOT_FOUND:
-                settings.universeStart = 2;
+                settings.universeStop = 2;
 				ESP_LOGI(TAG, "The universeStop is not initialized yet. Setting to default value: %d", settings.universeStop);
 				break;
 			default:
@@ -62,25 +64,29 @@ void LoadSettings() {
 				ESP_LOGE(TAG, "Error %s reading dmx_start", esp_err_to_name(err));
 		}
 
-        err = nvs_get_str(load_handle, "ssid", &settings.ssid, sizeof(settings.ssid));
+		str_len = sizeof(settings.ssid);
+
+        err = nvs_get_str(load_handle, "ssid", &settings.ssid, &str_len);
 		switch (err) {
 			case ESP_OK:
 				break;
 			case ESP_ERR_NVS_NOT_FOUND:
-                settings.ssid[0] = "\0";
-				ESP_LOGI(TAG, "The ssid is not initialized yet. Setting to blank");
+                settings.ssid[0] = '\0';
+				ESP_LOGI(TAG, "The ssid is not initialized yet. Setting first byte to null");
 				break;
 			default:
 				ESP_LOGE(TAG, "Error %s reading ssid", esp_err_to_name(err));
 		}
 
-        err = nvs_get_str(load_handle, "password", &settings.password, sizeof(settings.password));
+		str_len = sizeof(settings.password);
+
+        err = nvs_get_str(load_handle, "password", &settings.password, &str_len);
 		switch (err) {
 			case ESP_OK:
 				break;
 			case ESP_ERR_NVS_NOT_FOUND:
-                settings.password[0] = "\0";
-				ESP_LOGI(TAG, "The password is not initialized yet. Setting to blank");
+                settings.password[0] = '\0';
+				ESP_LOGI(TAG, "The password is not initialized yet. Setting first byte to null");
 				break;
 			default:
 				ESP_LOGE(TAG, "Error %s reading password", esp_err_to_name(err));
@@ -120,12 +126,12 @@ void SaveSettings() {
             ESP_LOGE(TAG, "Error %s saving dmx_start", esp_err_to_name(err));
         }
 
-        err = nvs_set_str(save_handle, "ssid", settings.ssid);
+        err = nvs_set_str(save_handle, "ssid", &settings.ssid);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "Error %s saving ssid", esp_err_to_name(err));
         }
 
-        err = nvs_set_str(save_handle, "password", settings.password);
+        err = nvs_set_str(save_handle, "password", &settings.password);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "Error %s saving password", esp_err_to_name(err));
         }
