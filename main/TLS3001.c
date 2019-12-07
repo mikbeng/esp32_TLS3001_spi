@@ -106,9 +106,9 @@ esp_err_t TLS3001_ch1_init(uint16_t num_pixels)
 	TLS3001_handle_ch1.spi_mosi_pin = CH1_PIN_NUM_MOSI;
 	TLS3001_handle_ch1.spi_clk_pin = CH1_PIN_NUM_CLK;
 
-	//Create a queue capable of containing 1 pointer to pixel_message_s structure.
+	//Create a queue capable of containing 10 pointer to pixel_message_s structure.
    	//This structure should be passed by pointer as it contains a lot of data.
-	TLS3001_input_queue=xQueueCreate(1, sizeof(pixel_message_s *));
+	TLS3001_input_queue=xQueueCreate(10, sizeof(pixel_message_s *));
     if(TLS3001_input_queue == NULL){
 		ESP_LOGE(__func__, "xQueueCreate() failed");
     }
@@ -155,7 +155,7 @@ esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint16_
         //Send copy of pointer to pixel_message_s structure to TLS3001 task
         if(xQueueSend(TLS3001_input_queue, (void *) &pixel_message_packet_p,(TickType_t )10))
         {
-            ESP_LOGI(TAG, "successfully posted pattern data on queue");
+            ESP_LOGD(TAG, "successfully posted pattern data on queue");
         }
         else
         {
