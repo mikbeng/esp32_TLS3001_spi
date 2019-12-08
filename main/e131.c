@@ -82,9 +82,6 @@ void e131task(void *pvParameters) {
 
 void e131init() {
 	
-	//create mutex for pixel data
-	pixel_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
-
 	xTaskCreate(&e131task, "E131_task", 4096, NULL, 5, NULL);
 }
 

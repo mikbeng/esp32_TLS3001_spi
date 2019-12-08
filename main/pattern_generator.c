@@ -68,7 +68,6 @@ void pattern_gen_task(void *arg)
 
 esp_err_t pattern_init()
 {
-    TLS3001_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
 	
     xTaskCreate(&pattern_gen_task, "pattern_gen_task", 4096, NULL, 5, NULL);
 
@@ -79,43 +78,6 @@ esp_err_t pattern_init()
 
 static void delay(int delay){
     vTaskDelay(((uint32_t)delay) / portTICK_PERIOD_MS);
-}
-
-static void pattern_TLS3001_show()
-{
-    //Create a pointer to send over the queue
-    //pixel_message_s *TLS3001_data_packet_p = &TLS3001_data_packet;
-
-    TLS3001_send_to_queue(&TLS3001_data_packet, &pattern_color_array, num_pixels_setting);
-    
-    /*
-    if( xSemaphoreTake(TLS3001_data_packet_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
-        {
-            //ESP_LOGD(TAG, "Generating equal color data");
-
-            TLS3001_data_packet_p->color_data_p = &pattern_color_array;
-            TLS3001_data_packet_p->pixel_len = num_pixels_setting;
-            
-            //Done with the data
-            xSemaphoreGive(TLS3001_data_packet_p->data_semaphore_guard);
-
-            //Send copy of pointer to pixel_message_s structure to TLS3001 task
-            if(xQueueSend(TLS3001_input_queue, (void *) &TLS3001_data_packet_p,(TickType_t )10))
-            {
-                //ESP_LOGD(TAG, "successfully posted pattern data on queue. Pixels: %d", TLS3001_data_packet_p->pixel_len);
-            }
-            else
-            {
-                ESP_LOGW(TAG, "Queue full. Did not post any data!");
-            }        
-
-        }
-    else
-        {
-            //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
-            ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
-        }
-        */
 }
 
 static void setPixel(int Pixel, uint8_t red, uint8_t green, uint8_t blue) {
@@ -137,37 +99,12 @@ static void pattern_equal_color(uint16_t red, uint16_t green, uint16_t blue, uin
         pattern_color_array[(i*3)+2] = blue;
 	}
 
-  pattern_TLS3001_show(num_pixels);
-  delay(100);
+    TLS3001_data_packet.color_data_p = &pattern_color_array;
+    TLS3001_data_packet.pixel_len = num_pixels;
 
-/*
-  if( xSemaphoreTake(pattern_data_packet_tp->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE )
-    {
-        ESP_LOGI(TAG, "Generating equal color data");
-
-        pattern_data_packet_tp->color_data_p = &pattern_color_array;
-        pattern_data_packet_tp->pixel_len = num_pixels;
-        
-        //Done with the data
-        xSemaphoreGive(pattern_data_packet_tp->data_semaphore_guard);
-
-        //Send copy of pointer to pixel_message_s structure to TLS3001 task
-        if(xQueueSend(TLS3001_input_queue, (void *) &pattern_data_packet_tp,(TickType_t )10))
-        {
-            ESP_LOGI(TAG, "successfully posted pattern data on queue");
-        }
-        else
-        {
-            ESP_LOGW(TAG, "Queue full. Did not post any data!");
-        }        
-
-    }
-  else
-    {
-        //The semaphore could not be taken. This would mean that the TLS3001_task is still processing the data.
-        ESP_LOGW(TAG, "Semaphore busy! TLS3001_task still processing data");
-    }
-*/
+    //Send to ch1 queue
+    TLS3001_send_to_queue(&TLS3001_data_packet, 1);
+    delay(100);
 
 }
 
@@ -187,7 +124,11 @@ static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int 
                    ((sin(i+Position) * 127 + 128)/255)*blue);
       }
 
-      pattern_TLS3001_show(num_pixels);
+      TLS3001_data_packet.color_data_p = &pattern_color_array;
+      TLS3001_data_packet.pixel_len = num_pixels;
+
+      //Send to ch1 queue
+      TLS3001_send_to_queue(&TLS3001_data_packet, 1);
       delay(WaveDelay);
   }
 }
@@ -195,7 +136,12 @@ static void pattern_RunningLights(uint8_t red, uint8_t green, uint8_t blue, int 
 static void pattern_colorWipe(uint8_t red, uint8_t green, uint8_t blue, int SpeedDelay, uint16_t num_pixels) {
   for(uint16_t i=0; i<num_pixels; i++) {
       setPixel(i, red, green, blue);
-      pattern_TLS3001_show(num_pixels);
+
+      TLS3001_data_packet.color_data_p = &pattern_color_array;
+      TLS3001_data_packet.pixel_len = num_pixels;
+
+      //Send to ch1 queue
+      TLS3001_send_to_queue(&TLS3001_data_packet, 1);
       delay(SpeedDelay);
   }
 }
@@ -251,6 +197,5 @@ void pattern_set_effect(pattern_effect_enum pattern_effect_cmd, uint16_t *rgb_cm
 
 void pattern_set_pixel_number(uint16_t num_pixels)
 {
-    //Todo: Put semaphore guard here?
     num_pixels_setting = num_pixels;
 }

@@ -10,6 +10,12 @@
 #define CH1_PIN_NUM_MOSI 23
 #define CH1_PIN_NUM_CLK  18
 
+#define CH2_PIN_NUM_MOSI 10
+#define CH2_PIN_NUM_CLK  5
+
+#define TLS3001_TASKQUEUE_CH1_LEN 10
+#define TLS3001_TASKQUEUE_CH2_LEN 10
+
 #define PIXELS_CONNECTED 361    //Total length of connected LED array. Even if not all pixels will be used, be sure to still specify the entire lenght here.
 #define USE_GAMMA_CORR 1        //Uncomment if gamma correction is not needed.
 
@@ -49,20 +55,21 @@ typedef struct
     spi_host_device_t spi_channel;
     spi_device_handle_t spi_handle;
     uint32_t spi_freq;
+    uint32_t spi_dma_channel;
     int spi_mosi_pin;
     int spi_clk_pin;
+    QueueHandle_t  TLS3001_input_queue;		//Queue for sending pixel-data to the TLS3001 task that sends out data to the pixels via SPI
 }TLS3001_handle_s;
 
 typedef struct 
 {
 uint16_t *color_data_p;                     //Pointer to uint16_t array that contains all the pixel data. I.e: {r,g,b,r,g,b,...,r,g,b}
 uint16_t pixel_len;                         //The number of pixels that the array contains.
-SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the data is thread-safe
 }pixel_message_s;
 
-//extern QueueHandle_t  TLS3001_input_queue;
-esp_err_t TLS3001_ch1_init(uint16_t num_pixels);
-esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint16_t *color_array, uint16_t pixel_len);
+
+esp_err_t TLS3001_init(uint16_t num_pixels_ch1, uint16_t num_pixels_ch2);
+esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint8_t channel);
 
 void TLS3001_show(uint16_t *color_data, uint16_t num_pixels);
 

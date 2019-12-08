@@ -88,15 +88,16 @@ void app_main()
 	ESP_ERROR_CHECK( err );
 	LoadSettings();
 
-	uint16_t num_pixels_user = PIXELS_CONNECTED;		//Maximum number of pixels on strip. 361 for the one on my desk.
+	uint16_t num_pixels_ch1 = PIXELS_CONNECTED;		//Maximum number of pixels on strip. 361 for the one on my desk.
+    uint16_t num_pixels_ch2 = 20;	
 
-	TLS3001_ch1_init(num_pixels_user);
+	TLS3001_init(num_pixels_ch1, num_pixels_ch2);
 	pattern_init();
 
 	start_cli_passive_mode();	//Starts the CLI task
 
-	initialise_wifi();
-	xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
-	e131init();
+	//initialise_wifi();
+	//xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+	//e131init();
 }
 
