@@ -12,4 +12,5 @@ typedef enum {
 esp_err_t pattern_init();
 void pattern_set_pixel_number(uint16_t num_pixels);
 void pattern_set_effect(pattern_effect_enum pattern_effect_cmd, uint16_t *rgb_cmd, int delay_cmd);
+void pattern_set_default(uint16_t pattern);
 

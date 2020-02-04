@@ -37,6 +37,16 @@ struct rgb_color_cmd_s {
 int effect_delay;
 
 void pattern_gen_task(void *arg) {	 
+	//Load globals with values from NVS
+	pettern_effect = settings.selected_pattern;
+	ESP_LOGI(TAG, "Loaded selected pattern from NVS: %d.", pettern_effect);
+
+	//Some default color in struct (Used if pattern is used as default pattern)
+	rgb_color.red = 1024;
+	rgb_color.green = 512;
+	rgb_color.blue = 256;
+	effect_delay = 55;
+
 	while(1) {
 		switch (pettern_effect) {
 		case equal_color:
@@ -50,17 +60,18 @@ void pattern_gen_task(void *arg) {
 		case colorWipe:
 			pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, settings.pixel_number);
 			pattern_colorWipe(0x00,0x00,0x00, effect_delay, settings.pixel_number);
-			break;		 
+			break;
+
 		default:
 			vTaskDelay(10 / portTICK_PERIOD_MS); 
 			break;
 		}
-	}		
+	}
 }
 
 esp_err_t pattern_init() {
 	TLS3001_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
-	
+
 	xTaskCreate(&pattern_gen_task, "pattern_gen_task", 4096, NULL, 5, NULL);
 
 	ESP_LOGI(TAG, "pattern_gen initiated!");
@@ -222,6 +233,11 @@ void pattern_set_effect(pattern_effect_enum pattern_effect_cmd, uint16_t *rgb_cm
 void pattern_set_pixel_number(uint16_t num_pixels) {
 	//Todo: Put semaphore guard here?
 	settings.pixel_number = num_pixels;
+	SaveSettings();
+}
+
+void pattern_set_default(uint16_t pattern) {
+	settings.selected_pattern = pattern;
 	SaveSettings();
 }
 

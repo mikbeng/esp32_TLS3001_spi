@@ -13,6 +13,11 @@ static struct {
 } pattern_pixel_number_args;
 
 static struct {
+	struct arg_int * pattern_default;
+	struct arg_end * end;
+} pattern_default_args;
+
+static struct {
 	struct arg_str * rgb;
 	struct arg_end * end;
 } pattern_equal_color_args;
@@ -51,6 +56,32 @@ static int pattern_pixel_number_command(int argc, char** argv) {
 	}
 	ESP_LOGI(__func__, "pixels: %d", pattern_pixel_number_args.num_pixels->ival[0]);
 	pattern_set_pixel_number(pattern_pixel_number_args.num_pixels->ival[0]);
+
+	return 0;
+}
+
+static int pattern_default_command(int argc, char** argv) {
+	int nerrors = arg_parse(argc, argv, (void**) &pattern_default_args);
+	if (nerrors != 0) {
+		arg_print_errors(stderr, pattern_default_args.end, argv[0]);
+		return 1;
+	}
+
+	if (pattern_default_args.pattern_default->count > 0) {
+		if (pattern_default_args.pattern_default->ival[0] > 4) {
+			ESP_LOGE(__func__, "Default pattern must be between 0 and x.");
+			return 1;
+		}
+		if (pattern_default_args.pattern_default->ival[0] < 0) {
+			ESP_LOGE(__func__, "Default pattern must be between 0 and x.");
+			return 1;
+		}
+	} else {
+		ESP_LOGE(__func__, "Default pattern must be specified.");
+		return 1;
+	}
+	ESP_LOGI(__func__, "Default pattern set: %d", pattern_default_args.pattern_default->ival[0]);
+	pattern_set_default(pattern_default_args.pattern_default->ival[0]);
 
 	return 0;
 }
@@ -161,6 +192,19 @@ void register_TLS3001() {
 		.argtable = &pattern_pixel_number_args
 	};
 	esp_console_cmd_register(&set_pixel_number_cmd);
+
+	// ------------  set default_pattern command
+	pattern_default_args.pattern_default = arg_int1("p", "pattern_default", "<pattern_default>", "Set default pattern. Will be stored in settings.");
+	pattern_default_args.end = arg_end(2);
+	
+	const esp_console_cmd_t set_pattern_default_cmd = { 
+		.command = "pattern_default",
+		.help = "Set default pattern.",
+		.hint = NULL,
+		.func = pattern_default_command,
+		.argtable = &pattern_default_args
+	};
+	esp_console_cmd_register(&set_pattern_default_cmd);
 
 	// ------------  set equal color command
 	pattern_equal_color_args.rgb = arg_str1(NULL, NULL, "<r,g,b>", "rgb color data values 12 bits (0-4095)");
