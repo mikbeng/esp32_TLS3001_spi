@@ -37,8 +37,12 @@ static int pattern_pixel_number_command(int argc, char** argv) {
 	}
 
 	if (pattern_pixel_number_args.num_pixels->count > 0) {
-		if(pattern_pixel_number_args.num_pixels->ival[0] > PIXELS_CONNECTED) {
+		if (pattern_pixel_number_args.num_pixels->ival[0] > PIXELS_CONNECTED) {
 			ESP_LOGE(__func__, "Number of pixels is higher than PIXELS_CONNECTED: %d", PIXELS_CONNECTED);
+			return 1;
+		}
+		if (pattern_pixel_number_args.num_pixels->ival[0] < 3) {
+			ESP_LOGE(__func__, "Number of pixels must be at least 2.");
 			return 1;
 		}
 	} else {
@@ -146,7 +150,7 @@ static int pattern_equal_color_command(int argc, char** argv) {
 
 void register_TLS3001() {
 	// ------------  set pixel number command
-	pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to lit");
+	pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to light. Will be stored in settings.");
 	pattern_pixel_number_args.end = arg_end(2);
 	
 	const esp_console_cmd_t set_pixel_number_cmd = { 

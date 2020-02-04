@@ -10,6 +10,7 @@
 #include "TLS3001.h"
 #include "pattern_generator.h"
 #include "math.h"
+#include "settings.h"
 
 #define NUM_LEDS PIXELS_CONNECTED
 
@@ -25,8 +26,6 @@ static pixel_message_s TLS3001_data_packet;
 //Allocate a local color array buffer to be used as storing the color data.
 static uint16_t pattern_color_array[PIXELS_CONNECTED*3];
 
-static uint16_t num_pixels_setting;
-
 pattern_effect_enum pettern_effect = 0;
 
 struct rgb_color_cmd_s {
@@ -41,16 +40,16 @@ void pattern_gen_task(void *arg) {
 	while(1) {
 		switch (pettern_effect) {
 		case equal_color:
-			pattern_equal_color(rgb_color.red, rgb_color.green, rgb_color.blue, num_pixels_setting);
+			pattern_equal_color(rgb_color.red, rgb_color.green, rgb_color.blue, settings.pixel_number);
 			break;
 
 		case Running_Lights:
-			pattern_RunningLights((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, num_pixels_setting);
+			pattern_RunningLights((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, settings.pixel_number);
 			break;
 
 		case colorWipe:
-			pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, num_pixels_setting);
-			pattern_colorWipe(0x00,0x00,0x00, effect_delay, num_pixels_setting);
+			pattern_colorWipe((uint8_t) rgb_color.red, (uint8_t) rgb_color.green, (uint8_t) rgb_color.blue, effect_delay, settings.pixel_number);
+			pattern_colorWipe(0x00,0x00,0x00, effect_delay, settings.pixel_number);
 			break;		 
 		default:
 			vTaskDelay(10 / portTICK_PERIOD_MS); 
@@ -77,14 +76,14 @@ static void pattern_TLS3001_show() {
 	//Create a pointer to send over the queue
 	//pixel_message_s *TLS3001_data_packet_p = &TLS3001_data_packet;
 
-	TLS3001_send_to_queue(&TLS3001_data_packet, &pattern_color_array, num_pixels_setting);
+	TLS3001_send_to_queue(&TLS3001_data_packet, &pattern_color_array, settings.pixel_number);
 
 	/*
 	if( xSemaphoreTake(TLS3001_data_packet_p->data_semaphore_guard, ( TickType_t ) 10 ) == pdTRUE ) {
 			//ESP_LOGD(TAG, "Generating equal color data");
 
 			TLS3001_data_packet_p->color_data_p = &pattern_color_array;
-			TLS3001_data_packet_p->pixel_len = num_pixels_setting;
+			TLS3001_data_packet_p->pixel_len = settings.pixel_number;
 
 			//Done with the data
 			xSemaphoreGive(TLS3001_data_packet_p->data_semaphore_guard);
@@ -222,6 +221,7 @@ void pattern_set_effect(pattern_effect_enum pattern_effect_cmd, uint16_t *rgb_cm
 
 void pattern_set_pixel_number(uint16_t num_pixels) {
 	//Todo: Put semaphore guard here?
-	num_pixels_setting = num_pixels;
+	settings.pixel_number = num_pixels;
+	SaveSettings();
 }
 

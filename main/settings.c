@@ -76,16 +76,16 @@ void LoadSettings() {
 				ESP_LOGE(TAG, "Error %s reading pixel_number", esp_err_to_name(err));
 		}
 
-		err = nvs_get_u16(load_handle, "selected_pattern", &settings.selected_pattern);
+		err = nvs_get_u16(load_handle, "selectedpattern", &settings.selected_pattern);
 		switch (err) {
 			case ESP_OK:
 				break;
 			case ESP_ERR_NVS_NOT_FOUND:
 				settings.selected_pattern = 0;
-				ESP_LOGI(TAG, "The selected_pattern is not initialized yet. Setting to default value: %d", settings.selected_pattern);
+				ESP_LOGI(TAG, "The selectedpattern is not initialized yet. Setting to default value: %d", settings.selected_pattern);
 				break;
 			default:
-				ESP_LOGE(TAG, "Error %s reading selected_pattern", esp_err_to_name(err));
+				ESP_LOGE(TAG, "Error %s reading selectedpattern", esp_err_to_name(err));
 		}
 
 		str_len = sizeof(settings.ssid);
@@ -153,9 +153,9 @@ void SaveSettings() {
 			ESP_LOGE(TAG, "Error %s saving pixel_number", esp_err_to_name(err));
 		}
 
-		err = nvs_set_u16(save_handle, "selected_pattern", settings.selected_pattern);
+		err = nvs_set_u16(save_handle, "selectedpattern", settings.selected_pattern);
 		if (err != ESP_OK) {
-			ESP_LOGE(TAG, "Error %s saving selected_pattern", esp_err_to_name(err));
+			ESP_LOGE(TAG, "Error %s saving selectedpattern", esp_err_to_name(err));
 		}
 
 		err = nvs_set_str(save_handle, "ssid", &settings.ssid);
