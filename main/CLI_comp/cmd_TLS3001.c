@@ -142,18 +142,17 @@ static int pattern_equal_color_command(int argc, char** argv) {
 
     token_color = strtok(NULL, s);
     int_color[2] = atoi(token_color);
-    
+
     ESP_LOGI(__func__,"%d,%d,%d",int_color[0],int_color[1],int_color[2]);
-   
+
     pattern_set_effect(equal_color, int_color, 0);
-    
+
     //pattern_send_equal_color(int_color, set_all_pixel_color_args.num_pixels->ival[0]);
 	//ESP_LOGI(__func__,"%d,%d,%d",set_all_pixel_color_args.red->ival[0], set_all_pixel_color_args.green->ival[0], set_all_pixel_color_args.blue->ival[0]);
 	return 0;
 }
 
 void register_TLS3001() {
-
     // ------------  set pixel number command
     pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to lit");
     pattern_pixel_number_args.end = arg_end(2);
@@ -184,7 +183,7 @@ void register_TLS3001() {
 	pattern_running_lights_args.rgb = arg_str1(NULL, NULL, "<r,g,b>", "rgb color data values 12 bits (0-4095)");
     pattern_running_lights_args.delay = arg_int1("d", "delay", "<delay>", "set delay effect");
     pattern_running_lights_args.end = arg_end(2);
-	
+
 	const esp_console_cmd_t running_lights_cmd = { 
 		.command = "pattern_RunningLights",
 		.help = "Set running lights effect",
@@ -207,5 +206,5 @@ void register_TLS3001() {
 		.argtable = &pattern_colorWipe_args
 	};
 	esp_console_cmd_register(&colorWipe_cmd);
-
 }
+

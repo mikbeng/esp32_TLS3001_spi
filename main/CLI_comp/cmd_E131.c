@@ -9,7 +9,7 @@
 
 
 static struct {
-    struct arg_int * universeStart;
+	struct arg_int * universeStart;
 	struct arg_int * universeStop;
 	struct arg_int * DMXStart;
 	struct arg_end * end;
