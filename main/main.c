@@ -95,6 +95,7 @@ void app_main()
 
 	start_cli_passive_mode();	//Starts the CLI task
 
+	//Todo: Don't try to connect to Wifi if SSID is not set
 	initialise_wifi();
 	xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
 	e131init();
