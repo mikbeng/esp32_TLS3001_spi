@@ -64,6 +64,30 @@ void LoadSettings() {
 				ESP_LOGE(TAG, "Error %s reading dmx_start", esp_err_to_name(err));
 		}
 
+		err = nvs_get_u16(load_handle, "pixel_number", &settings.pixel_number);
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+				settings.pixel_number = 10;
+				ESP_LOGI(TAG, "The pixel_number is not initialized yet. Setting to default value: %d", settings.pixel_number);
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading pixel_number", esp_err_to_name(err));
+		}
+
+		err = nvs_get_u16(load_handle, "selected_pattern", &settings.selected_pattern);
+		switch (err) {
+			case ESP_OK:
+				break;
+			case ESP_ERR_NVS_NOT_FOUND:
+				settings.selected_pattern = 0;
+				ESP_LOGI(TAG, "The selected_pattern is not initialized yet. Setting to default value: %d", settings.selected_pattern);
+				break;
+			default:
+				ESP_LOGE(TAG, "Error %s reading selected_pattern", esp_err_to_name(err));
+		}
+
 		str_len = sizeof(settings.ssid);
 		err = nvs_get_str(load_handle, "ssid", &settings.ssid, &str_len);
 		switch (err) {
@@ -122,6 +146,16 @@ void SaveSettings() {
 		err = nvs_set_u16(save_handle, "dmx_start", settings.dmx_start);
 		if (err != ESP_OK) {
 			ESP_LOGE(TAG, "Error %s saving dmx_start", esp_err_to_name(err));
+		}
+
+		err = nvs_set_u16(save_handle, "pixel_number", settings.pixel_number);
+		if (err != ESP_OK) {
+			ESP_LOGE(TAG, "Error %s saving pixel_number", esp_err_to_name(err));
+		}
+
+		err = nvs_set_u16(save_handle, "selected_pattern", settings.selected_pattern);
+		if (err != ESP_OK) {
+			ESP_LOGE(TAG, "Error %s saving selected_pattern", esp_err_to_name(err));
 		}
 
 		err = nvs_set_str(save_handle, "ssid", &settings.ssid);

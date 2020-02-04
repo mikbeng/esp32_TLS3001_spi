@@ -9,6 +9,8 @@ typedef struct {
     uint16_t dmx_start;
     char ssid[32];  
     char password[64];
+	uint16_t pixel_number;
+	uint16_t selected_pattern;
 } settings_t;
 
 settings_t settings;
