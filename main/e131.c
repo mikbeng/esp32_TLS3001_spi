@@ -55,7 +55,7 @@ void e131task(void *pvParameters) {
 		return;
 	}
 
-	printf("Listening for connections.\n");
+	printf("Listening for E1.31 sACN connections.\n");
 
 	while(1) {
 		struct netbuf *buf;
@@ -66,17 +66,17 @@ void e131task(void *pvParameters) {
 			continue;
 		}
 
+		//If packet is 638 bytes we handle it as a correct package and copy it to e131packet struct
 		if (buf->p->tot_len == sizeof(e131packet.raw)) {
-			//If packet is 638 bytes we handle it as a correct package and copy it to e131packet struct
 			memcpy(e131packet.raw, buf->p->payload, buf->p->tot_len);
 			e131packet.universe = reverse(e131packet.universe);
 			if (e131packet.universe == 1) {
-				ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
+				//ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
 			} else {
-				ESP_LOGE(TAG, "Invalid DMX Universe: %d", e131packet.universe);
+				//ESP_LOGE(TAG, "Invalid DMX Universe: %d", e131packet.universe);
 			}
 		} else {
-			printf("Wrong packet size.\n\n");
+			//printf("Wrong packet size.\n\n");
 		}
 
 		netbuf_delete(buf);

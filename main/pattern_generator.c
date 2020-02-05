@@ -62,6 +62,10 @@ void pattern_gen_task(void *arg) {
 			pattern_colorWipe(0x00,0x00,0x00, effect_delay, settings.pixel_number);
 			break;
 
+		case artery:
+			vTaskDelay(50 / portTICK_PERIOD_MS); 
+			break;
+
 		default:
 			vTaskDelay(10 / portTICK_PERIOD_MS); 
 			break;

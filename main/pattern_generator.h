@@ -6,7 +6,8 @@
 typedef enum {
     equal_color = 1,
     Running_Lights,
-    colorWipe
+    colorWipe,
+	artery,
 } pattern_effect_enum;
 
 esp_err_t pattern_init();
