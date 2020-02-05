@@ -34,6 +34,17 @@ static struct {
 	struct arg_end * end;
 } pattern_colorWipe_args;
 
+static struct {
+	struct arg_int * width;
+	struct arg_int * gap;
+	struct arg_int * bpm;
+	struct arg_int * flow;
+	struct arg_int * hue;
+	struct arg_int * dimmin;
+	struct arg_int * dimmax;
+	struct arg_end * end;
+} pattern_artery_args;
+
 static int pattern_pixel_number_command(int argc, char** argv) {
 	int nerrors = arg_parse(argc, argv, (void**) &pattern_pixel_number_args);
 	if (nerrors != 0) {
@@ -179,6 +190,89 @@ static int pattern_equal_color_command(int argc, char** argv) {
 	return 0;
 }
 
+static int pattern_artery_command(int argc, char** argv) {
+	int nerrors = arg_parse(argc, argv, (void**) &pattern_artery_args);
+	if (nerrors != 0) {
+		arg_print_errors(stderr, pattern_artery_args.end, argv[0]);
+		return 1;
+	}
+
+	int16_t width = -1;
+	int16_t gap = -1;
+	int16_t bpm = -1;
+	int16_t flow = -1;
+	int16_t hue = -1;
+	int16_t dimmin = -1;
+	int16_t dimmax = -1;
+	if (pattern_artery_args.width->count == 1) {
+		if (pattern_artery_args.width->ival[0] > 0 &&
+			pattern_artery_args.width->ival[0] <= 255) {
+			width = pattern_artery_args.width->ival[0];
+		} else {
+			ESP_LOGE(__func__, "Width must be between 1-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.gap->count == 1) {
+		if (pattern_artery_args.gap->ival[0] > 0 &&
+			pattern_artery_args.gap->ival[0] <= 255) {
+			gap = pattern_artery_args.gap->ival[0];
+		} else {
+			ESP_LOGE(__func__, "Gap must be between 1-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.bpm->count == 1) {
+		if (pattern_artery_args.bpm->ival[0] > 0 &&
+			pattern_artery_args.bpm->ival[0] <= 255) {
+			bpm = pattern_artery_args.bpm->ival[0];
+		} else {
+			ESP_LOGE(__func__, "BPM must be between 1-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.flow->count == 1) {
+		if (pattern_artery_args.flow->ival[0] >= 0 &&
+			pattern_artery_args.flow->ival[0] <= 255) {
+			flow = pattern_artery_args.flow->ival[0];
+		} else {
+			ESP_LOGE(__func__, "Flow must be between 0-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.hue->count == 1) {
+		if (pattern_artery_args.hue->ival[0] >= 0 &&
+			pattern_artery_args.hue->ival[0] <= 255) {
+			hue = pattern_artery_args.hue->ival[0];
+		} else {
+			ESP_LOGE(__func__, "HUE must be between 0-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.dimmin->count == 1) {
+		if (pattern_artery_args.dimmin->ival[0] >= 0 &&
+			pattern_artery_args.dimmin->ival[0] <= 255) {
+			dimmin = pattern_artery_args.dimmin->ival[0];
+		} else {
+			ESP_LOGE(__func__, "Dim min must be between 0-255");
+			return 1;
+		}
+	}
+	if (pattern_artery_args.dimmax->count == 1) {
+		if (pattern_artery_args.dimmax->ival[0] >= 0 &&
+			pattern_artery_args.dimmax->ival[0] <= 255) {
+			dimmax = pattern_artery_args.dimmax->ival[0];
+		} else {
+			ESP_LOGE(__func__, "Dim max must be between 0-255");
+			return 1;
+		}
+	}
+	ESP_LOGI(__func__, "artery width: %d gap: %d bpm: %d flow: %d hue: %d dimmin: %d dimmax: %d",
+			width, gap, bpm, flow, hue, dimmin, dimmax);
+
+	return 0;
+}
+
 void register_TLS3001() {
 	// ------------  set pixel number command
 	pattern_pixel_number_args.num_pixels = arg_int1("p", "num_pixels", "<num_pixels>", "number of pixels to light. Will be stored in settings.");
@@ -246,5 +340,24 @@ void register_TLS3001() {
 		.argtable = &pattern_colorWipe_args
 	};
 	esp_console_cmd_register(&colorWipe_cmd);
+
+	// ------------  set default_pattern command
+	pattern_artery_args.width = arg_int0("w", "width", "<1-255>", "Width of beat");
+	pattern_artery_args.gap = arg_int0("g", "gap", "<1-255>", "Gap between beats");
+	pattern_artery_args.bpm = arg_int0("b", "bpm", "<1-255>", "Beats flash in BPM");
+	pattern_artery_args.flow = arg_int0("f", "flow", "<0-255>", "Flow of beats");
+	pattern_artery_args.hue = arg_int0("h", "hue", "<0-255>", "Color of beats");
+	pattern_artery_args.dimmin = arg_int0("n", "dimmin", "<0-255>", "Minimum dim level of beat");
+	pattern_artery_args.dimmax = arg_int0("m", "dimmax", "<0-255>", "Maximum dim level of beat");
+	pattern_artery_args.end = arg_end(2);
+
+	const esp_console_cmd_t pattern_artery_cmd = {
+		.command = "pattern_artery",
+		.help = "Start artery pattern with flashing beats.",
+		.hint = NULL,
+		.func = pattern_artery_command,
+		.argtable = &pattern_artery_args
+	};
+	esp_console_cmd_register(&pattern_artery_cmd);
 }
 

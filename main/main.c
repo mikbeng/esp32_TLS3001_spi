@@ -93,7 +93,7 @@ void app_main()
 	TLS3001_ch1_init(num_pixels_user);
 	pattern_init();
 
-	start_cli_passive_mode();	//Starts the CLI task
+	start_cli_passive_mode();
 
 	//Todo: Don't try to connect to Wifi if SSID is not set
 	initialise_wifi();
