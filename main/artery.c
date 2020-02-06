@@ -8,6 +8,9 @@
 
 #include "settings.h"
 #include "pattern_generator.h"
+#include "e131.h"
+
+static const char * TAG = "artery";
 
 int segment_pixels;
 int segment_index;
@@ -31,8 +34,41 @@ void init_artery_values() {
 	beat_parameters.pulse_light_max = 0.2;
 }
 
+beat_parameters_t readparametersfromdmx() {
+	if (e131packet.universe != settings.universeStart) {
+		//ESP_LOGI(TAG, "DMX Universe %d, looking for %d", e131packet.universe, settings.universeStart);
+		// If not configured universe, return parameters as is
+		return beat_parameters;
+	}
+
+	int dmx_address = settings.dmx_start;
+
+	beat_parameters_t paramout;
+	// Read parameters from DMX values
+	paramout.pulse_light_max = (float)e131packet.property_values[dmx_address+DMX_LIGHT_MAX] / 255;
+	paramout.pulse_light_min = ((float)e131packet.property_values[dmx_address+DMX_LIGHT_MIN] / 255) * paramout.pulse_light_max;
+	paramout.pulse_hue = (float)e131packet.property_values[dmx_address+DMX_HUE] / 255;
+	paramout.pulse_width = e131packet.property_values[dmx_address+DMX_WIDTH];
+	paramout.pulse_gap = e131packet.property_values[dmx_address+DMX_GAP];
+	paramout.pulse_bpm = e131packet.property_values[dmx_address+DMX_BPM];
+	paramout.pulse_flow = e131packet.property_values[dmx_address+DMX_FLOW];
+
+	// Make sure values are whithin ranges
+	if (paramout.pulse_width < 1) {
+		paramout.pulse_width = 1;
+	}
+	if (paramout.pulse_gap < 1) {
+		paramout.pulse_gap = 1;
+	}
+	if (paramout.pulse_bpm < 1) {
+		paramout.pulse_bpm = 1;
+	}
+
+	return paramout;
+}
+
 void artery_tick() {
-	//beat_parameters = readparametersfromdmx(dmx_address);
+	beat_parameters = readparametersfromdmx();
 
 	// Calculate beat, and light level on beat
 	//printf("Tick %d\n", xTaskGetTickCount()*portTICK_PERIOD_MS);
