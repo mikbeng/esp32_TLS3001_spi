@@ -288,3 +288,37 @@ void pattern_set_default(uint16_t pattern) {
 	SaveSettings();
 }
 
+void pattern_artery(int16_t width, int16_t gap, int16_t bpm, int16_t flow, int16_t hue, int16_t dimmin, int16_t dimmax) {
+	// All parameters are optional, don't set parameter if -1
+	if (width != -1) {
+		beat_parameters.pulse_width = width;
+	}
+	if (gap != -1) {
+		beat_parameters.pulse_gap = gap;
+	}
+	if (bpm != -1) {
+		beat_parameters.pulse_bpm = bpm;
+	}
+	if (flow != -1) {
+		beat_parameters.pulse_flow = flow;
+	}
+	if (hue != -1) {
+		beat_parameters.pulse_hue = (float)hue / 255;
+	}
+	if (dimmin != -1) {
+		beat_parameters.pulse_light_min = (float)dimmin / 255;
+	}
+	if (dimmax != -1) {
+		beat_parameters.pulse_light_max = (float)dimmax / 255;
+	}
+	ESP_LOGI(TAG, "artery pattern width: %d gap: %d bpm: %d flow: %d hue: %f dimmin: %f dimmax: %f",
+			beat_parameters.pulse_width,
+			beat_parameters.pulse_gap,
+			beat_parameters.pulse_bpm,
+			beat_parameters.pulse_flow,
+			beat_parameters.pulse_hue,
+			beat_parameters.pulse_light_min,
+			beat_parameters.pulse_light_max);
+	pettern_effect = artery;
+}
+

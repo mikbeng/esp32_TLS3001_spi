@@ -269,6 +269,7 @@ static int pattern_artery_command(int argc, char** argv) {
 	}
 	ESP_LOGI(__func__, "artery width: %d gap: %d bpm: %d flow: %d hue: %d dimmin: %d dimmax: %d",
 			width, gap, bpm, flow, hue, dimmin, dimmax);
+	pattern_artery(width, gap, bpm, flow, hue, dimmin, dimmax);
 
 	return 0;
 }
