@@ -25,13 +25,13 @@ uint32_t beatms;
 uint32_t diff;
 
 void init_artery_values() {
-	beat_parameters.pulse_width = 4;
-	beat_parameters.pulse_gap = 10;
+	beat_parameters.pulse_width = 18;
+	beat_parameters.pulse_gap = 40;
 	beat_parameters.pulse_bpm = 128;
-	beat_parameters.pulse_flow = 30;
+	beat_parameters.pulse_flow = 70;
 	beat_parameters.pulse_hue = 0.0;
 	beat_parameters.pulse_light_min = 0.0;
-	beat_parameters.pulse_light_max = 0.2;
+	beat_parameters.pulse_light_max = 0.1;
 }
 
 beat_parameters_t readparametersfromdmx() {
