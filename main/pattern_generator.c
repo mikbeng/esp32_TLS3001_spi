@@ -158,7 +158,7 @@ void pattern_gen_task(void *arg) {
 		case artery:
 			artery_tick();
 			pattern_TLS3001_show();
-			vTaskDelay(50 / portTICK_PERIOD_MS);
+			vTaskDelay(20 / portTICK_PERIOD_MS);
 			break;
 
 		default:
