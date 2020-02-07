@@ -71,14 +71,12 @@ void artery_tick() {
 	beat_parameters = readparametersfromdmx();
 
 	// Calculate beat, and light level on beat
-	//printf("Tick %d\n", xTaskGetTickCount()*portTICK_PERIOD_MS);
 	now = xTaskGetTickCount()*portTICK_PERIOD_MS;
 	beatms = (((float)60/beat_parameters.pulse_bpm)*1000)/2;
 	if (now > beat_end) {
 		// Calculate next beat
 		beat_mid = now + beatms;
 		beat_end = beat_mid + beatms;
-		//printf("Double beat %d %d\n", beatms, beat_end);
 	}
 	if (now < beat_mid) {
 		// Start of beat, go up
@@ -89,7 +87,6 @@ void artery_tick() {
 		diff = beat_end - now;
 		beat_level = 1.0 - ((float)diff / beatms);
 	}
-	//printf("Beat level %f\n", beat_level);
 
 	// By offseting segments a movement can be created
 	segment_pixels = beat_parameters.pulse_width + beat_parameters.pulse_gap;
@@ -111,7 +108,8 @@ void artery_tick() {
 			if (segment_index == beat_parameters.pulse_width-1) {
 				pixel_lightlevel = pixel_lightlevel * pixel_rest;
 			}
-			pixel_lightlevel = pixel_lightlevel * beat_level;
+			// Light level with beat level, but cap it to light min level
+			pixel_lightlevel = max(pixel_lightlevel * beat_level, beat_parameters.pulse_light_min);
 		} else {
 			pixel_lightlevel = 0;
 		}

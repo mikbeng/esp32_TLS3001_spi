@@ -23,6 +23,12 @@ enum DMX_CHANNEL {
 	DMX_LIGHT_MAX,
 };
 
+#define min(x, y) (((x) < (y)) ? (x) : (y))
+#define max(a,b) \
+	({ __typeof__ (a) _a = (a); \
+	__typeof__ (b) _b = (b); \
+	_a > _b ? _a : _b; })
+
 beat_parameters_t beat_parameters;
 
 void init_artery_values();
