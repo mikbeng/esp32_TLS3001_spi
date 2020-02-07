@@ -12,6 +12,7 @@
 
 static const char * TAG = "artery";
 
+uint8_t bpm_last = 0;
 int segment_pixels;
 int segment_index;
 float segment_offset = 0.0;
@@ -70,10 +71,11 @@ beat_parameters_t readparametersfromdmx() {
 void artery_tick() {
 	beat_parameters = readparametersfromdmx();
 
-	// Calculate beat, and light level on beat
+	// Timing of beats
 	now = xTaskGetTickCount()*portTICK_PERIOD_MS;
 	beatms = (((float)60/beat_parameters.pulse_bpm)*1000)/2;
-	if (now > beat_end) {
+	// If beat have past, or BPM value changed, calculate next beat
+	if (now > beat_end || beat_parameters.pulse_bpm != bpm_last) {
 		// Calculate next beat
 		beat_mid = now + beatms;
 		beat_end = beat_mid + beatms;
@@ -87,6 +89,8 @@ void artery_tick() {
 		diff = beat_end - now;
 		beat_level = 1.0 - ((float)diff / beatms);
 	}
+	// Update last for use in next tick
+	bpm_last = beat_parameters.pulse_bpm;
 
 	// By offseting segments a movement can be created
 	segment_pixels = beat_parameters.pulse_width + beat_parameters.pulse_gap;
