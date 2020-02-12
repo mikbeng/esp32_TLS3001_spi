@@ -42,23 +42,21 @@
 
 #define SYNCH_DELAY_PER_PIXEL (28.34)
 
-typedef struct
-{
-    void *spi_tx_data_start;
-    uint16_t num_pixels;
-    spi_host_device_t spi_channel;
-    spi_device_handle_t spi_handle;
-    uint32_t spi_freq;
-    int spi_mosi_pin;
-    int spi_clk_pin;
-}TLS3001_handle_s;
+typedef struct {
+	void *spi_tx_data_start;
+	uint16_t num_pixels;
+	spi_host_device_t spi_channel;
+	spi_device_handle_t spi_handle;
+	uint32_t spi_freq;
+	int spi_mosi_pin;
+	int spi_clk_pin;
+} TLS3001_handle_s;
 
-typedef struct 
-{
-uint16_t *color_data_p;                     //Pointer to uint16_t array that contains all the pixel data. I.e: {r,g,b,r,g,b,...,r,g,b}
-uint16_t pixel_len;                         //The number of pixels that the array contains.
-SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the data is thread-safe
-}pixel_message_s;
+typedef struct {
+	uint16_t *color_data_p;                     //Pointer to uint16_t array that contains all the pixel data. I.e: {r,g,b,r,g,b,...,r,g,b}
+	uint16_t pixel_len;                         //The number of pixels that the array contains.
+	SemaphoreHandle_t data_semaphore_guard;     //Semaphore for making sure that the data is thread-safe
+} pixel_message_s;
 
 //extern QueueHandle_t  TLS3001_input_queue;
 esp_err_t TLS3001_ch1_init(uint16_t num_pixels);

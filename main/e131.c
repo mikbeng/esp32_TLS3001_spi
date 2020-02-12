@@ -21,7 +21,6 @@
 #include "TLS3001.h"
 
 static const char *TAG = "E1.31";
-e131_packet_t e131packet; /* Packet buffer */
 
 pixel_message_s pixel_data_packet;	//pixel data packet
 
@@ -35,14 +34,14 @@ void e131task(void *pvParameters) {
 	
 	/* Create a new connection handle */
 	conn = netconn_new(NETCONN_UDP);
-	if(!conn) {
+	if (!conn) {
 		printf("Error: Failed to allocate socket.\n");
 		return;
 	}
 
 	/* Bind to port with default IP address */
 	err = netconn_bind(conn, IP_ADDR_ANY, E131_DEFAULT_PORT);
-	if(err != ERR_OK) {
+	if (err != ERR_OK) {
 		printf("Error: Failed to bind socket. err=%d\n", err);
 		return;
 	}
@@ -51,29 +50,33 @@ void e131task(void *pvParameters) {
 	IP_ADDR4(&multiaddr, 239, 255, 0, 1); //IPv4 local scope multicast
 
 	err = netconn_join_leave_group(conn, &multiaddr, &netif_default->ip_addr, NETCONN_JOIN);
-	if(err != ERR_OK) {
+	if (err != ERR_OK) {
 		printf("Error: Join Multicast Group. err=%d\n", err);
 		return;
 	}
 
-	printf("Listening for connections.\n");
+	printf("Listening for E1.31 sACN connections.\n");
 
 	while(1) {
 		struct netbuf *buf;
 
 		err = netconn_recv(conn, &buf);
-		if(err != ERR_OK) {
+		if (err != ERR_OK) {
 			printf("Error: Failed to receive packet. err=%d\n", err);
 			continue;
 		}
 
-		if(buf->p->tot_len == sizeof(e131packet.raw)) {
-			//If packet is 638 bytes we handle it as a correct package and copy it to e131packet struct
+		//If packet is 638 bytes we handle it as a correct package and copy it to e131packet struct
+		if (buf->p->tot_len == sizeof(e131packet.raw)) {
 			memcpy(e131packet.raw, buf->p->payload, buf->p->tot_len);
 			e131packet.universe = reverse(e131packet.universe);
-			//ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
+			if (e131packet.universe == 1) {
+				//ESP_LOGI(TAG, "Universe %d channel 1 %d", e131packet.universe, e131packet.property_values[1]);
+			} else {
+				//ESP_LOGE(TAG, "Invalid DMX Universe: %d", e131packet.universe);
+			}
 		} else {
-			printf("Wrong packet size.\n\n");
+			//printf("Wrong packet size.\n\n");
 		}
 
 		netbuf_delete(buf);
@@ -81,8 +84,7 @@ void e131task(void *pvParameters) {
 }
 
 void e131init() {
-	
-	//create mutex for pixel data
+	//Create mutex for pixel data
 	pixel_data_packet.data_semaphore_guard = xSemaphoreCreateMutex();
 
 	xTaskCreate(&e131task, "E131_task", 4096, NULL, 5, NULL);

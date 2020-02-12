@@ -40,6 +40,8 @@ typedef union {
 	uint8_t raw[638];
 } e131_packet_t;
 
+e131_packet_t e131packet; /* Packet buffer for E1.31 sASC DMX-512 data */
+
 void e131init();
 
 #endif /* E131_H_ */

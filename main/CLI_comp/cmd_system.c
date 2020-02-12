@@ -9,11 +9,7 @@
 
 #include "CLI.h"
 
-
-
-
 static int system_tasks_command(int argc, char** argv) {
-	
 	TaskStatus_t * status_array;
 	uint32_t ulTotalRunTime;
 	size_t num_tasks = uxTaskGetNumberOfTasks();
@@ -31,8 +27,7 @@ static int system_tasks_command(int argc, char** argv) {
 	
 	/* For each populated position in the pxTaskStatusArray array,
 		format the raw data as human readable ASCII data. */
-	for (int x = 0; x < num_tasks; x++)
-	{
+	for (int x = 0; x < num_tasks; x++) {
 		char task_state[20];
 		switch (status_array[x].eCurrentState) {
 		case eReady:
@@ -51,9 +46,9 @@ static int system_tasks_command(int argc, char** argv) {
 			strcpy(task_state, "\x1B[36mDEL\x1B[0m");
 			break;
 		}
-		
+
 		float percent = 100.0f * ((float)status_array[x].ulRunTimeCounter) / ((float)ulTotalRunTime);
-		
+
 		printf("  %d\t  %s\t     %d\t          %d\t   %.1f\t\t%s\n", 
 			status_array[x].xTaskNumber,
 			task_state,
@@ -69,14 +64,12 @@ static int system_tasks_command(int argc, char** argv) {
 
 
 static int system_reboot_comand(int argc, char** argv) {
-	
 	esp_restart();
-	
+
 	return 0;
 }
 
 static int system_exit_comand(int argc, char** argv) {
-	
 	//int clear_flag = 0;
 	//flash_config_set_cli_flag(&clear_flag);
 	esp_restart();
@@ -86,7 +79,6 @@ static int system_exit_comand(int argc, char** argv) {
 
 
 void register_system() {
-	
 	const esp_console_cmd_t reboot_cmd = {
 			.command = "reboot",
 		.help = "Reboot ESP32",
@@ -94,7 +86,7 @@ void register_system() {
 		.func = system_reboot_comand,
 		.hint = NULL
 	};
-	
+
 	const esp_console_cmd_t exit_cmd = {
 		.command = "exit",
 		.help = "Exits cli",
@@ -102,7 +94,7 @@ void register_system() {
 		.func = system_exit_comand,
 		.hint = NULL
 	};
-	
+
 	const esp_console_cmd_t task_cmd = {
 		.command = "tasks",
 		.help = "Prints all tasks",
@@ -110,9 +102,9 @@ void register_system() {
 		.func = system_tasks_command,
 		.hint = NULL
 	};
-	
-	
+
 	ESP_ERROR_CHECK(esp_console_cmd_register(&reboot_cmd));
 	ESP_ERROR_CHECK(esp_console_cmd_register(&exit_cmd));
 	ESP_ERROR_CHECK(esp_console_cmd_register(&task_cmd));
 }
+

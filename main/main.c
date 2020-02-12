@@ -67,9 +67,9 @@ static void initialise_wifi(void) {
 	ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
 	ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
 
-    wifi_config_t wifi_config;
-    strcpy((const char *) &wifi_config.sta.ssid, &settings.ssid);
-    strcpy((const char *) &wifi_config.sta.password, &settings.password);
+	wifi_config_t wifi_config;
+	strcpy((const char *) &wifi_config.sta.ssid, &settings.ssid);
+	strcpy((const char *) &wifi_config.sta.password, &settings.password);
 
 	ESP_LOGI(TAG, "Setting WiFi configuration SSID: '%s'", wifi_config.sta.ssid);
 	ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
@@ -88,13 +88,14 @@ void app_main()
 	ESP_ERROR_CHECK( err );
 	LoadSettings();
 
-	uint16_t num_pixels_user = PIXELS_CONNECTED;		//Maximum number of pixels on strip. 361 for the one on my desk.
+	uint16_t num_pixels_user = PIXELS_CONNECTED;	//Maximum number of pixels on strip. 361 for the one on my desk.
 
 	TLS3001_ch1_init(num_pixels_user);
 	pattern_init();
 
-	start_cli_passive_mode();	//Starts the CLI task
+	start_cli_passive_mode();
 
+	//Todo: Don't try to connect to Wifi if SSID is not set
 	initialise_wifi();
 	xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
 	e131init();
