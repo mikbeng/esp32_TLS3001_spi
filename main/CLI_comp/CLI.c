@@ -93,10 +93,10 @@ static void initialize_cli() {
 		.stop_bits = UART_STOP_BITS_1,
 		.use_ref_tick = true
 	};
-	ESP_ERROR_CHECK(uart_param_config(CONFIG_CONSOLE_UART_NUM, &uart_config));
+	ESP_ERROR_CHECK(uart_param_config(CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
 
 	/* Install UART driver for interrupt-driven reads and writes */
-	ESP_ERROR_CHECK(uart_driver_install(CONFIG_CONSOLE_UART_NUM,
+	ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM,
 		256,
 		0,
 		0,
@@ -104,7 +104,7 @@ static void initialize_cli() {
 		0));
 
 	/* Tell VFS to use UART driver */
-	esp_vfs_dev_uart_use_driver(CONFIG_CONSOLE_UART_NUM);
+	esp_vfs_dev_uart_use_driver(CONFIG_ESP_CONSOLE_UART_NUM);
 	
 	
 	// Initialize the console
@@ -295,7 +295,7 @@ void cli_passive_task(void* p) {
 			bzero(rxbuf, 256);
 			switch (event.type) {
 				case UART_DATA:
-					uart_read_bytes(CONFIG_CONSOLE_UART_NUM, rxbuf, event.size, portMAX_DELAY);
+					uart_read_bytes(CONFIG_ESP_CONSOLE_UART_NUM, rxbuf, event.size, portMAX_DELAY);
 					
 					// Check if rxbuf contains activation phrase for CLI
 					if (check_uart_data(rxbuf, event.size)) {
@@ -303,7 +303,7 @@ void cli_passive_task(void* p) {
 						ESP_LOGI(TAG, "match");
 						
 						// Delete driver so CLI can install it's own
-						uart_driver_delete(CONFIG_CONSOLE_UART_NUM);
+						uart_driver_delete(CONFIG_ESP_CONSOLE_UART_NUM);
 						
 						// Start CLI
 						start_cli();
@@ -341,12 +341,12 @@ void start_cli_passive_mode() {
 		.stop_bits = UART_STOP_BITS_1,
 		.use_ref_tick = true
 	};
-	ESP_ERROR_CHECK(uart_param_config(CONFIG_CONSOLE_UART_NUM, &uart_config));
+	ESP_ERROR_CHECK(uart_param_config(CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
 
 	
-	uart_driver_delete(CONFIG_CONSOLE_UART_NUM);
+	uart_driver_delete(CONFIG_ESP_CONSOLE_UART_NUM);
 	/* Install UART driver for interrupt-driven reads and writes */
-	ESP_ERROR_CHECK(uart_driver_install(CONFIG_CONSOLE_UART_NUM,
+	ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM,
 		256,
 		0,
 		1,

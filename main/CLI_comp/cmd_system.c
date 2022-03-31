@@ -50,6 +50,8 @@ static int system_tasks_command(int argc, char** argv) {
 		case eDeleted:
 			strcpy(task_state, "\x1B[36mDEL\x1B[0m");
 			break;
+		case eInvalid:
+			break;
 		}
 		
 		float percent = 100.0f * ((float)status_array[x].ulRunTimeCounter) / ((float)ulTotalRunTime);
