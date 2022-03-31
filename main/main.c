@@ -88,11 +88,11 @@ void app_main()
 	ESP_ERROR_CHECK( err );
 	LoadSettings();
 
-	uint16_t num_pixels_ch1 = 5;		//Maximum number of pixels on strip. 361 for the one on my desk.
-    uint16_t num_pixels_ch2 = 0;	
+	uint16_t num_pixels_ch1 = 13;		//Maximum number of pixels on strip. 361 for the one on my desk.
+    uint16_t num_pixels_ch2 = 13;	
 
 	TLS3001_init(num_pixels_ch1, num_pixels_ch2);
-	//pattern_init();
+	pattern_init();
 
 	start_cli_passive_mode();	//Starts the CLI task
 

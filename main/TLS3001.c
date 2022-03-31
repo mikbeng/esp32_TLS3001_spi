@@ -64,6 +64,7 @@ static TLS3001_handle_s TLS3001_handle_ch1 = {0};
 static TLS3001_handle_s TLS3001_handle_ch2 = {0};
 
 static TLS3001_internal_state_t TLS3001_state_keeper = { 0 };
+
 /* ========================================================================= */
 /* [PFUN] Private functions implementations                                  */
 /* ========================================================================= */
@@ -87,7 +88,7 @@ static void s_TLS3001_task(void *arg)
             xQueueReceive( xActivatedMember, &(pixel_message_incomming_ch1_p), 0 );
             
             #if TLS3001_DEBUG_PRINTS_EN 
-                ESP_LOGI(TAG, "Recieved pixel data on ch1 queue. Length: %u", pixel_message_incomming_ch1_p->pixel_len);
+                ESP_LOGD(TAG, "Recieved pixel data on ch1 queue. Length: %u", pixel_message_incomming_ch1_p->pixel_len);
             #endif
 
             //Process the pixel data. Fill the SPI buffer with new data.
@@ -207,7 +208,7 @@ static esp_err_t s_TLS3001_ch2_init(uint16_t num_pixels)
     xQueueAddToSet((QueueSetMemberHandle_t)TLS3001_handle_ch2.TLS3001_input_queue, xQueueSet);
 
 	//Calculate SPI buffer size
-	ch2_buffer_mem_size_byte = (uint16_t ) ceil(((TLS3001_handle_ch2.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI)/8);
+	ch2_buffer_mem_size_byte = (uint16_t ) ceil(((double)((TLS3001_handle_ch1.num_pixels*PIXEL_DATA_LEN_SPI)+START_CMD_LEN_SPI))/8);
 
 	if (s_SPI_init(&TLS3001_handle_ch2) != ESP_OK) {
 		printf("Error initializing spi channel 2\n");
@@ -303,6 +304,8 @@ static esp_err_t s_init_spi_data_buffer(void **spi_manchester_data_p, uint32_t b
 		return ESP_FAIL;
 	}
 
+	memset(*spi_manchester_data_p,0,byte_len);
+
 	return ESP_OK;
 }
 
@@ -348,15 +351,16 @@ static void s_TLS3001_prep_color_packet(uint8_t *spi_tx_data_start, uint16_t *co
 		{
 			color_data_local = 0x00;
 		}
-
-
-		spi_tx_data_last = s_pack_manchester_data_segment(spi_tx_data_start, (uint64_t)color_data_local, COLOR_DATA_LEN_MANCH, false);	
 		
 		if (i == ((num_color_pixels*3)-1))	//Last color in data. Call pack_manchester_data_segment with last_segment_flag = true.
 		{
-			//Something is wrong here! When we get here, we have already filled the buffer fully!
 			spi_tx_data_last = s_pack_manchester_data_segment(spi_tx_data_start, (uint64_t)color_data_local, COLOR_DATA_LEN_MANCH, true);
 		}		
+		else
+		{
+			//Pack as usual
+			spi_tx_data_last = s_pack_manchester_data_segment(spi_tx_data_start, (uint64_t)color_data_local, COLOR_DATA_LEN_MANCH, false);
+		}
 	
 	}
 
@@ -389,7 +393,6 @@ static void *s_pack_manchester_data_segment(uint8_t *spi_mem_data_p_start, uint6
 		if (manch_byte_pointer == 0)	//byte full. Write byte to memory
 		{
 			*(spi_mem_data_p_start+mem_p_offset) = manch_byte_temp;			//Debug fails hhere
-
 			
 			spi_mem_data_p_last = spi_mem_data_p_start+mem_p_offset;
 			mem_p_offset ++;	//Offset-pointer variable points to next free memory
@@ -555,7 +558,7 @@ esp_err_t TLS3001_send_to_queue(pixel_message_s *pixel_message_packet_p, uint8_t
         if(xQueueSend(TLS3001_handle_ch1.TLS3001_input_queue, (void *) &pixel_message_packet_p,(TickType_t )10))
         {
             #if TLS3001_DEBUG_PRINTS_EN 
-                ESP_LOGI(TAG, "successfully posted pattern data on ch1 queue");
+                ESP_LOGD(TAG, "successfully posted pattern data on ch1 queue");
             #endif
         }
         else
